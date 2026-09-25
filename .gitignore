@@ -1,0 +1,23 @@
+# Archivos compilados de Java
+out/
+*.class
+
+# Configuración local de VS Code
+.vscode/
+
+# Archivos temporales / logs
+*.log
+*.tmp
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Variables de entorno o configuraciones sensibles
+.env
+*.env
+
+# Configuraciones locales que puedan contener credenciales
+application.properties
+config.properties
+database.properties
