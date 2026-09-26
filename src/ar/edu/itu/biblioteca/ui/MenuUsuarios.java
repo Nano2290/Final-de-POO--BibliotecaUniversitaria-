@@ -17,6 +17,7 @@ public class MenuUsuarios {
         this.scanner = scanner;
     }
 
+
     public void iniciar() {
 
         int opcion;
@@ -51,12 +52,15 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    mostrarMensaje("Opcion invalida.");
+                    mostrarMensaje(
+                            "Opcion invalida."
+                    );
                     break;
             }
 
         } while (opcion != 0);
     }
+
 
     private void mostrarMenu() {
 
@@ -72,6 +76,7 @@ public class MenuUsuarios {
         System.out.println("╚══════════════════════════════════════════════╝");
     }
 
+
     private void registrarUsuario() {
 
         while (true) {
@@ -83,11 +88,15 @@ public class MenuUsuarios {
             System.out.println("╚══════════════════════════════════════════════╝");
 
             System.out.println();
-            System.out.println("Escriba 0 en cualquier momento para cancelar.");
+            System.out.println(
+                    "Escriba 0 en cualquier momento para cancelar."
+            );
             System.out.println();
 
             System.out.print("DNI: ");
-            String dni = scanner.nextLine().trim();
+
+            String dni =
+                    scanner.nextLine().trim();
 
             if (dni.equals("0")) {
                 return;
@@ -102,8 +111,11 @@ public class MenuUsuarios {
                 continue;
             }
 
+
             System.out.print("Nombre: ");
-            String nombre = scanner.nextLine().trim();
+
+            String nombre =
+                    scanner.nextLine().trim();
 
             if (nombre.equals("0")) {
                 return;
@@ -118,8 +130,11 @@ public class MenuUsuarios {
                 continue;
             }
 
+
             System.out.print("Apellido: ");
-            String apellido = scanner.nextLine().trim();
+
+            String apellido =
+                    scanner.nextLine().trim();
 
             if (apellido.equals("0")) {
                 return;
@@ -134,12 +149,16 @@ public class MenuUsuarios {
                 continue;
             }
 
+
             System.out.print("Email: ");
-            String email = scanner.nextLine().trim();
+
+            String email =
+                    scanner.nextLine().trim();
 
             if (email.equals("0")) {
                 return;
             }
+
 
             System.out.println();
             System.out.println("Tipo de usuario:");
@@ -147,9 +166,12 @@ public class MenuUsuarios {
             System.out.println("2. Docente");
             System.out.println("0. Cancelar");
 
-            System.out.print("\nSeleccione tipo: ");
+            System.out.print(
+                    "\nSeleccione tipo: "
+            );
 
-            int tipo = leerEntero();
+            int tipo =
+                    leerEntero();
 
             if (tipo == 0) {
                 return;
@@ -164,10 +186,12 @@ public class MenuUsuarios {
                 continue;
             }
 
+
             String tipoTexto =
                     tipo == 1
                             ? "ESTUDIANTE"
                             : "DOCENTE";
+
 
             limpiarPantalla();
 
@@ -192,7 +216,9 @@ public class MenuUsuarios {
 
             System.out.printf(
                     "║ Email:    %-34s║%n",
-                    email.isBlank() ? "-" : email
+                    email.isBlank()
+                            ? "-"
+                            : email
             );
 
             System.out.printf(
@@ -230,6 +256,7 @@ public class MenuUsuarios {
                 continue;
             }
 
+
             Usuario usuario;
 
             if (tipo == 1) {
@@ -253,6 +280,7 @@ public class MenuUsuarios {
                 );
             }
 
+
             UsuarioDAO usuarioDAO =
                     new UsuarioDAO();
 
@@ -272,7 +300,7 @@ public class MenuUsuarios {
 
                 if (
                         e.getMessage() != null
-                        && e.getMessage().contains(
+                                && e.getMessage().contains(
                                 "Duplicate entry"
                         )
                 ) {
@@ -293,6 +321,7 @@ public class MenuUsuarios {
             }
         }
     }
+
 
     private void buscarUsuario() {
 
@@ -318,6 +347,7 @@ public class MenuUsuarios {
             return;
         }
 
+
         UsuarioDAO usuarioDAO =
                 new UsuarioDAO();
 
@@ -341,6 +371,7 @@ public class MenuUsuarios {
         }
     }
 
+
     private void listarUsuarios() {
 
         UsuarioDAO usuarioDAO =
@@ -363,6 +394,7 @@ public class MenuUsuarios {
             );
         }
     }
+
 
     private void filtrarPorEstado() {
 
@@ -389,7 +421,7 @@ public class MenuUsuarios {
 
         if (
                 opcion != 1
-                && opcion != 2
+                        && opcion != 2
         ) {
 
             mostrarMensaje(
@@ -398,6 +430,7 @@ public class MenuUsuarios {
 
             return;
         }
+
 
         boolean estadoBuscado =
                 opcion == 1;
@@ -432,6 +465,7 @@ public class MenuUsuarios {
         }
     }
 
+
     private void seleccionarUsuario(
             List<Usuario> usuarios
     ) {
@@ -446,6 +480,7 @@ public class MenuUsuarios {
 
             return;
         }
+
 
         System.out.println(
                 "╔════════════════════════════════════════════════════════════════════════╗"
@@ -479,6 +514,7 @@ public class MenuUsuarios {
                 "----------------------------------------------------------------------------"
         );
 
+
         for (int i = 0; i < usuarios.size(); i++) {
 
             Usuario usuario =
@@ -505,6 +541,7 @@ public class MenuUsuarios {
             );
         }
 
+
         System.out.println(
                 "----------------------------------------------------------------------------"
         );
@@ -525,7 +562,7 @@ public class MenuUsuarios {
 
         if (
                 seleccion < 1
-                || seleccion > usuarios.size()
+                        || seleccion > usuarios.size()
         ) {
 
             mostrarMensaje(
@@ -534,6 +571,7 @@ public class MenuUsuarios {
 
             return;
         }
+
 
         Usuario usuarioSeleccionado =
                 usuarios.get(
@@ -544,6 +582,7 @@ public class MenuUsuarios {
                 usuarioSeleccionado
         );
     }
+
 
     private void mostrarFichaUsuario(
             Usuario usuario
@@ -567,9 +606,10 @@ public class MenuUsuarios {
 
             String email =
                     usuario.getEmail() == null
-                    || usuario.getEmail().isBlank()
+                            || usuario.getEmail().isBlank()
                             ? "-"
                             : usuario.getEmail();
+
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -653,6 +693,7 @@ public class MenuUsuarios {
             opcion =
                     leerEntero();
 
+
             switch (opcion) {
 
                 case 1: {
@@ -669,6 +710,7 @@ public class MenuUsuarios {
                     break;
                 }
 
+
                 case 2: {
 
                     MenuPrestamos menuPrestamos =
@@ -682,6 +724,7 @@ public class MenuUsuarios {
 
                     break;
                 }
+
 
                 case 3: {
 
@@ -697,24 +740,28 @@ public class MenuUsuarios {
                     break;
                 }
 
+
                 case 4:
 
-                    mostrarMensaje(
-                            "Modificar datos: funcion en preparacion."
+                    modificarDatosUsuario(
+                            usuario
                     );
 
                     break;
+
 
                 case 5:
 
-                    mostrarMensaje(
-                            "Cambiar estado: funcion en preparacion."
-                    );
+                       cambiarEstadoUsuario(
+                             usuario
+                       );
 
                     break;
+
 
                 case 0:
                     break;
+
 
                 default:
 
@@ -727,6 +774,415 @@ public class MenuUsuarios {
 
         } while (opcion != 0);
     }
+
+
+    private void modificarDatosUsuario(
+            Usuario usuario
+    ) {
+
+        limpiarPantalla();
+
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║              MODIFICAR DATOS                ║"
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "DNI: "
+                        + usuario.getDni()
+                        + " (no modificable)"
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "Para conservar un dato actual, presione ENTER."
+        );
+
+        System.out.println(
+                "Escriba 0 para cancelar."
+        );
+
+        System.out.println();
+
+
+        System.out.println(
+                "Nombre actual: "
+                        + usuario.getNombre()
+        );
+
+        System.out.print(
+                "Nuevo nombre: "
+        );
+
+        String nuevoNombre =
+                scanner.nextLine().trim();
+
+        if (nuevoNombre.equals("0")) {
+            return;
+        }
+
+        if (nuevoNombre.isEmpty()) {
+
+            nuevoNombre =
+                    usuario.getNombre();
+        }
+
+
+        System.out.println();
+
+        System.out.println(
+                "Apellido actual: "
+                        + usuario.getApellido()
+        );
+
+        System.out.print(
+                "Nuevo apellido: "
+        );
+
+        String nuevoApellido =
+                scanner.nextLine().trim();
+
+        if (nuevoApellido.equals("0")) {
+            return;
+        }
+
+        if (nuevoApellido.isEmpty()) {
+
+            nuevoApellido =
+                    usuario.getApellido();
+        }
+
+
+        System.out.println();
+
+        String emailActual =
+                usuario.getEmail() == null
+                        || usuario.getEmail().isBlank()
+                        ? "-"
+                        : usuario.getEmail();
+
+        System.out.println(
+                "Email actual: "
+                        + emailActual
+        );
+
+        System.out.print(
+                "Nuevo email: "
+        );
+
+        String nuevoEmail =
+                scanner.nextLine().trim();
+
+        if (nuevoEmail.equals("0")) {
+            return;
+        }
+
+        if (nuevoEmail.isEmpty()) {
+
+            nuevoEmail =
+                    usuario.getEmail();
+        }
+
+
+        limpiarPantalla();
+
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║           CONFIRMAR MODIFICACION            ║"
+        );
+
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
+
+        System.out.printf(
+                "║ DNI:      %-34s║%n",
+                usuario.getDni()
+        );
+
+        System.out.printf(
+                "║ Nombre:   %-34s║%n",
+                nuevoNombre
+        );
+
+        System.out.printf(
+                "║ Apellido: %-34s║%n",
+                nuevoApellido
+        );
+
+        System.out.printf(
+                "║ Email:    %-34s║%n",
+                nuevoEmail == null
+                        || nuevoEmail.isBlank()
+                        ? "-"
+                        : nuevoEmail
+        );
+
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
+
+        System.out.println(
+                "║  1. Confirmar cambios                       ║"
+        );
+
+        System.out.println(
+                "║  0. Cancelar                                ║"
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
+
+        System.out.print(
+                "\nSeleccione opcion: "
+        );
+
+
+        int confirmacion =
+                leerEntero();
+
+        if (confirmacion == 0) {
+            return;
+        }
+
+        if (confirmacion != 1) {
+
+            mostrarMensaje(
+                    "Opcion invalida."
+            );
+
+            return;
+        }
+
+
+        String nombreAnterior =
+                usuario.getNombre();
+
+        String apellidoAnterior =
+                usuario.getApellido();
+
+        String emailAnterior =
+                usuario.getEmail();
+
+
+        usuario.setNombre(
+                nuevoNombre
+        );
+
+        usuario.setApellido(
+                nuevoApellido
+        );
+
+        usuario.setEmail(
+                nuevoEmail
+        );
+
+
+        UsuarioDAO usuarioDAO =
+                new UsuarioDAO();
+
+        try {
+
+            boolean actualizado =
+                    usuarioDAO.actualizarDatos(
+                            usuario
+                    );
+
+            if (actualizado) {
+
+                mostrarMensaje(
+                        "Datos modificados correctamente."
+                );
+
+            } else {
+
+                usuario.setNombre(
+                        nombreAnterior
+                );
+
+                usuario.setApellido(
+                        apellidoAnterior
+                );
+
+                usuario.setEmail(
+                        emailAnterior
+                );
+
+                mostrarMensaje(
+                        "No se pudo modificar el usuario."
+                );
+            }
+
+        } catch (SQLException e) {
+
+            usuario.setNombre(
+                    nombreAnterior
+            );
+
+            usuario.setApellido(
+                    apellidoAnterior
+            );
+
+            usuario.setEmail(
+                    emailAnterior
+            );
+
+            mostrarMensaje(
+                    "Error al modificar los datos: "
+                            + e.getMessage()
+            );
+        }
+    }
+
+    private void cambiarEstadoUsuario(
+        Usuario usuario
+) {
+
+    limpiarPantalla();
+
+    boolean estadoActual =
+            usuario.isActivo();
+
+    String estadoActualTexto =
+            estadoActual
+                    ? "ACTIVO"
+                    : "SUSPENDIDO";
+
+    String nuevoEstadoTexto =
+            estadoActual
+                    ? "SUSPENDIDO"
+                    : "ACTIVO";
+
+    System.out.println(
+            "╔══════════════════════════════════════════════╗"
+    );
+
+    System.out.println(
+            "║              CAMBIAR ESTADO                 ║"
+    );
+
+    System.out.println(
+            "╠══════════════════════════════════════════════╣"
+    );
+
+    System.out.printf(
+            "║ Usuario: %-33s║%n",
+            usuario.getNombre()
+                    + " "
+                    + usuario.getApellido()
+    );
+
+    System.out.printf(
+            "║ DNI:     %-33s║%n",
+            usuario.getDni()
+    );
+
+    System.out.printf(
+            "║ Estado actual: %-26s║%n",
+            estadoActualTexto
+    );
+
+    System.out.printf(
+            "║ Nuevo estado:  %-26s║%n",
+            nuevoEstadoTexto
+    );
+
+    System.out.println(
+            "╠══════════════════════════════════════════════╣"
+    );
+
+    System.out.println(
+            "║  1. Confirmar cambio                        ║"
+    );
+
+    System.out.println(
+            "║  0. Cancelar                                ║"
+    );
+
+    System.out.println(
+            "╚══════════════════════════════════════════════╝"
+    );
+
+    System.out.print(
+            "\nSeleccione opcion: "
+    );
+
+    int confirmacion =
+            leerEntero();
+
+    if (confirmacion == 0) {
+        return;
+    }
+
+    if (confirmacion != 1) {
+
+        mostrarMensaje(
+                "Opcion invalida."
+        );
+
+        return;
+    }
+
+    boolean nuevoEstado =
+            !estadoActual;
+
+    usuario.setActivo(
+            nuevoEstado
+    );
+
+    UsuarioDAO usuarioDAO =
+            new UsuarioDAO();
+
+    try {
+
+        boolean actualizado =
+                usuarioDAO.actualizarEstado(
+                        usuario
+                );
+
+        if (actualizado) {
+
+            mostrarMensaje(
+                    "Estado actualizado correctamente."
+            );
+
+        } else {
+
+            usuario.setActivo(
+                    estadoActual
+            );
+
+            mostrarMensaje(
+                    "No se pudo actualizar el estado."
+            );
+        }
+
+    } catch (SQLException e) {
+
+        usuario.setActivo(
+                estadoActual
+        );
+
+        mostrarMensaje(
+                "Error al actualizar el estado: "
+                        + e.getMessage()
+        );
+    }
+}
 
     private int leerEntero() {
 
@@ -746,6 +1202,7 @@ public class MenuUsuarios {
             }
         }
     }
+
 
     private void mostrarMensaje(
             String mensaje
@@ -768,6 +1225,7 @@ public class MenuUsuarios {
         pausar();
     }
 
+
     private void pausar() {
 
         System.out.println();
@@ -779,13 +1237,20 @@ public class MenuUsuarios {
         scanner.nextLine();
     }
 
+
     private void limpiarPantalla() {
 
         try {
 
-            if (System.getProperty("os.name")
-                    .toLowerCase()
-                    .contains("windows")) {
+            if (
+                    System.getProperty(
+                                    "os.name"
+                            )
+                            .toLowerCase()
+                            .contains(
+                                    "windows"
+                            )
+            ) {
 
                 new ProcessBuilder(
                         "cmd",
@@ -798,13 +1263,17 @@ public class MenuUsuarios {
 
             } else {
 
-                System.out.print("\033[H\033[2J");
+                System.out.print(
+                        "\033[H\033[2J"
+                );
+
                 System.out.flush();
             }
 
         } catch (Exception e) {
 
             for (int i = 0; i < 30; i++) {
+
                 System.out.println();
             }
         }

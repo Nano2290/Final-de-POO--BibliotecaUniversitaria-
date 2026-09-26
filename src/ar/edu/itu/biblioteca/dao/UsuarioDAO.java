@@ -15,17 +15,29 @@ import java.util.List;
 
 public class UsuarioDAO {
 
-    public void guardar(Usuario usuario) throws SQLException {
+    public void guardar(
+            Usuario usuario
+    ) throws SQLException {
 
         String sql = """
                 INSERT INTO usuarios
-                (dni, nombre, apellido, email, tipo_usuario, activo)
+                (
+                    dni,
+                    nombre,
+                    apellido,
+                    email,
+                    tipo_usuario,
+                    activo
+                )
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
         try (
-                Connection conexion = ConexionBD.obtenerConexion();
-                PreparedStatement statement = conexion.prepareStatement(sql)
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
         ) {
 
             statement.setString(
@@ -66,8 +78,94 @@ public class UsuarioDAO {
     }
 
 
-    public Usuario buscarPorDni(String dni)
-            throws SQLException {
+    public boolean actualizarDatos(
+            Usuario usuario
+    ) throws SQLException {
+
+        String sql = """
+                UPDATE usuarios
+                SET
+                    nombre = ?,
+                    apellido = ?,
+                    email = ?
+                WHERE id = ?
+                """;
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setString(
+                    1,
+                    usuario.getNombre()
+            );
+
+            statement.setString(
+                    2,
+                    usuario.getApellido()
+            );
+
+            statement.setString(
+                    3,
+                    usuario.getEmail()
+            );
+
+            statement.setInt(
+                    4,
+                    usuario.getId()
+            );
+
+            int filasModificadas =
+                    statement.executeUpdate();
+
+            return filasModificadas > 0;
+        }
+    }
+
+
+    public boolean actualizarEstado(
+            Usuario usuario
+    ) throws SQLException {
+
+        String sql = """
+                UPDATE usuarios
+                SET activo = ?
+                WHERE id = ?
+                """;
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setBoolean(
+                    1,
+                    usuario.isActivo()
+            );
+
+            statement.setInt(
+                    2,
+                    usuario.getId()
+            );
+
+            int filasModificadas =
+                    statement.executeUpdate();
+
+            return filasModificadas > 0;
+        }
+    }
+
+
+    public Usuario buscarPorDni(
+            String dni
+    ) throws SQLException {
 
         String sql = """
                 SELECT
@@ -83,7 +181,9 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conexion = ConexionBD.obtenerConexion();
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
                 PreparedStatement statement =
                         conexion.prepareStatement(sql)
         ) {
@@ -131,9 +231,12 @@ public class UsuarioDAO {
                 """;
 
         try (
-                Connection conexion = ConexionBD.obtenerConexion();
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
                 PreparedStatement statement =
                         conexion.prepareStatement(sql);
+
                 ResultSet resultado =
                         statement.executeQuery()
         ) {
@@ -226,19 +329,29 @@ public class UsuarioDAO {
     ) throws SQLException {
 
         int id =
-                resultado.getInt("id");
+                resultado.getInt(
+                        "id"
+                );
 
         String dni =
-                resultado.getString("dni");
+                resultado.getString(
+                        "dni"
+                );
 
         String nombre =
-                resultado.getString("nombre");
+                resultado.getString(
+                        "nombre"
+                );
 
         String apellido =
-                resultado.getString("apellido");
+                resultado.getString(
+                        "apellido"
+                );
 
         String email =
-                resultado.getString("email");
+                resultado.getString(
+                        "email"
+                );
 
         String tipoUsuario =
                 resultado.getString(
@@ -286,7 +399,7 @@ public class UsuarioDAO {
 
             throw new SQLException(
                     "Tipo de usuario desconocido: "
-                    + tipoUsuario
+                            + tipoUsuario
             );
         }
 
