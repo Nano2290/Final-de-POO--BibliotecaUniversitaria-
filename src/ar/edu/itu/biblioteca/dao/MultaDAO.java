@@ -116,13 +116,10 @@ public class MultaDAO {
 
                 while (resultado.next()) {
 
-                    MultaResumen multa =
+                    multas.add(
                             construirMultaResumen(
                                     resultado
-                            );
-
-                    multas.add(
-                            multa
+                            )
                     );
                 }
             }
@@ -184,19 +181,63 @@ public class MultaDAO {
 
                 while (resultado.next()) {
 
-                    MultaResumen multa =
+                    multas.add(
                             construirMultaResumen(
                                     resultado
-                            );
-
-                    multas.add(
-                            multa
+                            )
                     );
                 }
             }
         }
 
         return multas;
+    }
+
+
+    public double obtenerTotalPendientePorUsuario(
+            int usuarioId
+    ) throws SQLException {
+
+        String sql = """
+                SELECT
+                    COALESCE(SUM(m.monto), 0) AS total_pendiente
+                FROM multas m
+                INNER JOIN prestamos p
+                    ON m.prestamo_id = p.id
+                WHERE p.usuario_id = ?
+                AND m.pagada = FALSE
+                """;
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    usuarioId
+            );
+
+            try (
+                    ResultSet resultado =
+                            statement.executeQuery()
+            ) {
+
+                if (
+                        resultado.next()
+                ) {
+
+                    return resultado.getDouble(
+                            "total_pendiente"
+                    );
+                }
+            }
+        }
+
+        return 0.0;
     }
 
 

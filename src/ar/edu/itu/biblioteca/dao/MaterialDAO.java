@@ -474,7 +474,14 @@ public class MaterialDAO {
                     cantidad_total,
                     cantidad_disponible
                 FROM materiales
-                ORDER BY id
+                ORDER BY
+                    CASE tipo_material
+                        WHEN 'LIBRO' THEN 1
+                        WHEN 'REVISTA' THEN 2
+                        WHEN 'TESIS' THEN 3
+                        ELSE 4
+                    END,
+                    codigo
                 """;
 
 

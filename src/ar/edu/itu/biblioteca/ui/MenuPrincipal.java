@@ -5,12 +5,18 @@ import java.util.Scanner;
 public class MenuPrincipal {
 
     private final Scanner scanner;
+    private final ConsolaUI ui;
 
     public MenuPrincipal() {
 
         scanner =
                 new Scanner(
                         System.in
+                );
+
+        ui =
+                new ConsolaUI(
+                        scanner
                 );
     }
 
@@ -20,7 +26,7 @@ public class MenuPrincipal {
 
         do {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             mostrarEncabezado();
 
@@ -33,19 +39,11 @@ public class MenuPrincipal {
             );
 
             System.out.println(
-                    "║  3. Registrar prestamo                      ║"
+                    "║  3. Gestion de prestamos                    ║"
             );
 
             System.out.println(
-                    "║  4. Registrar devolucion                    ║"
-            );
-
-            System.out.println(
-                    "║  5. Prestamos vencidos                      ║"
-            );
-
-            System.out.println(
-                    "║  6. Gestion de multas                       ║"
+                    "║  4. Gestion de multas                       ║"
             );
 
             System.out.println(
@@ -65,7 +63,7 @@ public class MenuPrincipal {
             );
 
             opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
             procesarOpcion(
                     opcion
@@ -77,7 +75,6 @@ public class MenuPrincipal {
 
         scanner.close();
     }
-
 
     private void mostrarEncabezado() {
 
@@ -93,7 +90,6 @@ public class MenuPrincipal {
                 "╠══════════════════════════════════════════════╣"
         );
     }
-
 
     private void procesarOpcion(
             int opcion
@@ -113,7 +109,6 @@ public class MenuPrincipal {
                 break;
             }
 
-
             case 2: {
 
                 MenuMateriales menuMateriales =
@@ -126,7 +121,6 @@ public class MenuPrincipal {
                 break;
             }
 
-
             case 3: {
 
                 MenuPrestamos menuPrestamos =
@@ -134,38 +128,18 @@ public class MenuPrincipal {
                                 scanner
                         );
 
-                menuPrestamos.registrarPrestamo();
+                menuPrestamos.iniciar();
 
                 break;
             }
 
-
             case 4:
 
-                mostrarMensaje(
-                        "Registro de devoluciones."
+                ui.mostrarMensaje(
+                        "La gestion global de multas se completara en el siguiente bloque."
                 );
 
                 break;
-
-
-            case 5:
-
-                mostrarMensaje(
-                        "Consulta de prestamos vencidos."
-                );
-
-                break;
-
-
-            case 6:
-
-                mostrarMensaje(
-                        "Gestion de multas."
-                );
-
-                break;
-
 
             case 0:
 
@@ -177,84 +151,13 @@ public class MenuPrincipal {
 
                 break;
 
-
             default:
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Opcion invalida. Intente nuevamente."
                 );
 
                 break;
-        }
-    }
-
-
-    private int leerEntero() {
-
-        while (true) {
-
-            try {
-
-                return Integer.parseInt(
-                        scanner.nextLine()
-                                .trim()
-                );
-
-            } catch (
-                    NumberFormatException e
-            ) {
-
-                System.out.print(
-                        "Ingrese un numero valido: "
-                );
-            }
-        }
-    }
-
-
-    private void mostrarMensaje(
-            String mensaje
-    ) {
-
-        System.out.println();
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        System.out.println(
-                mensaje
-        );
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        pausar();
-    }
-
-
-    private void pausar() {
-
-        System.out.println();
-
-        System.out.print(
-                "Presione ENTER para continuar..."
-        );
-
-        scanner.nextLine();
-    }
-
-
-    private void limpiarPantalla() {
-
-        for (
-                int i = 0;
-                i < 30;
-                i++
-        ) {
-
-            System.out.println();
         }
     }
 }

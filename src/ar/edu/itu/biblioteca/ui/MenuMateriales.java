@@ -15,6 +15,7 @@ import java.util.Scanner;
 public class MenuMateriales {
 
     private final Scanner scanner;
+    private final ConsolaUI ui;
 
     /*
      * Nos permite salir directamente desde una pantalla interna
@@ -29,6 +30,11 @@ public class MenuMateriales {
 
         this.scanner =
                 scanner;
+
+        this.ui =
+                new ConsolaUI(
+                        scanner
+                );
     }
 
 
@@ -41,7 +47,7 @@ public class MenuMateriales {
 
         do {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             mostrarMenu();
 
@@ -50,7 +56,7 @@ public class MenuMateriales {
             );
 
             opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             switch (opcion) {
@@ -109,7 +115,7 @@ public class MenuMateriales {
 
                 default:
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Opcion invalida."
                     );
 
@@ -179,7 +185,7 @@ public class MenuMateriales {
 
         while (true) {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
 
             System.out.println(
@@ -234,7 +240,7 @@ public class MenuMateriales {
 
 
             int tipo =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             if (tipo == 0) {
@@ -249,7 +255,7 @@ public class MenuMateriales {
                             && tipo != 3
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Tipo de material invalido."
                 );
 
@@ -297,7 +303,7 @@ public class MenuMateriales {
 
             } catch (SQLException e) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "No se pudo generar el codigo sugerido: "
                                 + e.getMessage()
                 );
@@ -376,7 +382,7 @@ public class MenuMateriales {
                         existente != null
                 ) {
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Ya existe un material registrado con ese codigo."
                     );
 
@@ -385,7 +391,7 @@ public class MenuMateriales {
 
             } catch (SQLException e) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Error al verificar el codigo: "
                                 + e.getMessage()
                 );
@@ -420,7 +426,7 @@ public class MenuMateriales {
                     titulo.isEmpty()
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El titulo es obligatorio."
                 );
 
@@ -436,7 +442,7 @@ public class MenuMateriales {
 
 
             int cantidad =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             if (
@@ -451,7 +457,7 @@ public class MenuMateriales {
                     cantidad < 1
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "La cantidad debe ser mayor que cero."
                 );
 
@@ -459,7 +465,7 @@ public class MenuMateriales {
             }
 
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
 
             System.out.println(
@@ -481,7 +487,7 @@ public class MenuMateriales {
 
             System.out.printf(
                     "║ Titulo:   %-34s║%n",
-                    recortarTexto(
+                    ui.recortarTexto(
                             titulo,
                             34
                     )
@@ -523,7 +529,7 @@ public class MenuMateriales {
 
 
             int confirmacion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             if (
@@ -546,7 +552,7 @@ public class MenuMateriales {
                     confirmacion != 1
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Opcion invalida."
                 );
 
@@ -607,7 +613,7 @@ public class MenuMateriales {
                 );
 
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Material registrado correctamente."
                 );
 
@@ -625,13 +631,13 @@ public class MenuMateriales {
                                 )
                 ) {
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Ya existe un material registrado con ese codigo."
                     );
 
                 } else {
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "No se pudo registrar el material: "
                                     + e.getMessage()
                     );
@@ -646,7 +652,7 @@ public class MenuMateriales {
 
     private void buscarMaterial() {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
 
         System.out.println(
@@ -696,7 +702,7 @@ public class MenuMateriales {
                 texto.isEmpty()
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Debe ingresar un codigo o titulo."
             );
 
@@ -721,7 +727,7 @@ public class MenuMateriales {
                     materiales.isEmpty()
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "No se encontraron materiales coincidentes."
                 );
 
@@ -741,7 +747,7 @@ public class MenuMateriales {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al buscar materiales: "
                             + e.getMessage()
             );
@@ -770,7 +776,7 @@ public class MenuMateriales {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al listar materiales: "
                             + e.getMessage()
             );
@@ -818,7 +824,7 @@ public class MenuMateriales {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar materiales: "
                             + e.getMessage()
             );
@@ -835,7 +841,7 @@ public class MenuMateriales {
                 !volverMenuPrincipal
         ) {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
 
             System.out.println(
@@ -856,7 +862,7 @@ public class MenuMateriales {
                     materiales.isEmpty()
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "No hay materiales para mostrar."
                 );
 
@@ -871,13 +877,12 @@ public class MenuMateriales {
             );
 
             System.out.printf(
-                    "%-4s %-12s %-30s %-12s %-8s %-12s%n",
+                    "%-4s %-12s %-30s %-12s %-12s%n",
                     "Nro",
                     "Codigo",
                     "Titulo",
                     "Tipo",
-                    "Total",
-                    "Disponibles"
+                    "Stock"
             );
 
             System.out.println(
@@ -897,23 +902,63 @@ public class MenuMateriales {
                         );
 
 
+                String tipoColoreado =
+                        Colores.tipoMaterial(
+                                material.obtenerTipoMaterial(),
+                                12
+                        );
+
+
+                String stockColoreado =
+                        Colores.disponibilidad(
+                                material.getCantidadDisponible(),
+                                material.getCantidadTotal(),
+                                12
+                        );
+
+
                 System.out.printf(
-                        "%-4d %-12s %-30s %-12s %-8d %-12d%n",
+                        "%-4d %-12s %-30s %s %s%n",
                         i + 1,
                         material.getCodigo(),
-                        recortarTexto(
+                        ui.recortarTexto(
                                 material.getTitulo(),
                                 30
                         ),
-                        material.obtenerTipoMaterial(),
-                        material.getCantidadTotal(),
-                        material.getCantidadDisponible()
+                        tipoColoreado,
+                        stockColoreado
                 );
             }
 
 
             System.out.println(
                     "--------------------------------------------------------------------------------"
+            );
+
+            System.out.println(
+                    Colores.AZUL
+                            + "LIBRO"
+                            + Colores.RESET
+                            + " | "
+                            + Colores.AMARILLO
+                            + "REVISTA"
+                            + Colores.RESET
+                            + " | "
+                            + Colores.CIAN
+                            + "TESIS"
+                            + Colores.RESET
+                            + "     Stock: "
+                            + Colores.VERDE
+                            + "disponible"
+                            + Colores.RESET
+                            + " / "
+                            + Colores.AMARILLO
+                            + "ultimo ejemplar"
+                            + Colores.RESET
+                            + " / "
+                            + Colores.ROJO
+                            + "sin stock"
+                            + Colores.RESET
             );
 
             System.out.println();
@@ -928,7 +973,7 @@ public class MenuMateriales {
 
 
             int opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             if (
@@ -944,7 +989,7 @@ public class MenuMateriales {
                             || opcion > materiales.size()
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Seleccion invalida."
                 );
 
@@ -973,7 +1018,7 @@ public class MenuMateriales {
                 !volverMenuPrincipal
         ) {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
 
             String disponibilidad =
@@ -1086,7 +1131,7 @@ public class MenuMateriales {
 
 
             int opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             switch (opcion) {
@@ -1156,7 +1201,7 @@ public class MenuMateriales {
 
                 default:
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Opcion invalida."
                     );
 
@@ -1170,7 +1215,7 @@ public class MenuMateriales {
             MaterialBibliografico material
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
 
         System.out.println(
@@ -1222,7 +1267,7 @@ public class MenuMateriales {
 
 
         int cantidad =
-                leerEntero();
+                ui.leerEntero();
 
 
         if (
@@ -1237,7 +1282,7 @@ public class MenuMateriales {
                 cantidad < 1
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "La cantidad debe ser mayor que cero."
             );
 
@@ -1285,7 +1330,7 @@ public class MenuMateriales {
 
 
         int confirmacion =
-                leerEntero();
+                ui.leerEntero();
 
 
         if (
@@ -1300,7 +1345,7 @@ public class MenuMateriales {
                 confirmacion != 1
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Opcion invalida."
             );
 
@@ -1332,14 +1377,14 @@ public class MenuMateriales {
             );
 
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Ejemplares agregados correctamente."
             );
 
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No se pudieron agregar los ejemplares: "
                             + e.getMessage()
             );
@@ -1351,7 +1396,7 @@ public class MenuMateriales {
             MaterialBibliografico material
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
 
         int prestados =
@@ -1405,7 +1450,7 @@ public class MenuMateriales {
                 material.getCantidadDisponible() == 0
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No hay ejemplares disponibles para quitar."
             );
 
@@ -1434,7 +1479,7 @@ public class MenuMateriales {
 
 
         int cantidad =
-                leerEntero();
+                ui.leerEntero();
 
 
         if (
@@ -1449,7 +1494,7 @@ public class MenuMateriales {
                 cantidad < 1
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "La cantidad debe ser mayor que cero."
             );
 
@@ -1461,7 +1506,7 @@ public class MenuMateriales {
                 cantidad > material.getCantidadDisponible()
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No se pueden quitar "
                             + cantidad
                             + " ejemplares. Solo hay "
@@ -1518,7 +1563,7 @@ public class MenuMateriales {
 
 
         int confirmacion =
-                leerEntero();
+                ui.leerEntero();
 
 
         if (
@@ -1533,7 +1578,7 @@ public class MenuMateriales {
                 confirmacion != 1
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Opcion invalida."
             );
 
@@ -1563,7 +1608,7 @@ public class MenuMateriales {
             );
 
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Ejemplares quitados correctamente."
             );
 
@@ -1573,7 +1618,7 @@ public class MenuMateriales {
                         | IllegalArgumentException e
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No se pudieron quitar los ejemplares: "
                             + e.getMessage()
             );
@@ -1683,140 +1728,6 @@ public class MenuMateriales {
                         "",
                         linea
                 );
-            }
-        }
-    }
-
-
-    private String recortarTexto(
-            String texto,
-            int longitudMaxima
-    ) {
-
-        if (
-                texto == null
-        ) {
-
-            return "-";
-        }
-
-
-        if (
-                texto.length()
-                        <= longitudMaxima
-        ) {
-
-            return texto;
-        }
-
-
-        return texto.substring(
-                0,
-                longitudMaxima - 3
-        ) + "...";
-    }
-
-
-    private int leerEntero() {
-
-        while (true) {
-
-            try {
-
-                return Integer.parseInt(
-                        scanner.nextLine()
-                                .trim()
-                );
-
-            } catch (
-                    NumberFormatException e
-            ) {
-
-                System.out.print(
-                        "Ingrese un numero valido: "
-                );
-            }
-        }
-    }
-
-
-    private void mostrarMensaje(
-            String mensaje
-    ) {
-
-        System.out.println();
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        System.out.println(
-                mensaje
-        );
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        pausar();
-    }
-
-
-    private void pausar() {
-
-        System.out.println();
-
-        System.out.print(
-                "Presione ENTER para continuar..."
-        );
-
-        scanner.nextLine();
-    }
-
-
-    private void limpiarPantalla() {
-
-        try {
-
-            if (
-                    System.getProperty(
-                                    "os.name"
-                            )
-                            .toLowerCase()
-                            .contains(
-                                    "windows"
-                            )
-            ) {
-
-                new ProcessBuilder(
-                        "cmd",
-                        "/c",
-                        "cls"
-                )
-                        .inheritIO()
-                        .start()
-                        .waitFor();
-
-            } else {
-
-                System.out.print(
-                        "\033[H\033[2J"
-                );
-
-                System.out.flush();
-            }
-
-        } catch (
-                Exception e
-        ) {
-
-            for (
-                    int i = 0;
-                    i < 30;
-                    i++
-            ) {
-
-                System.out.println();
             }
         }
     }

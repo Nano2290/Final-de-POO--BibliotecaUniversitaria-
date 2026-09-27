@@ -12,10 +12,16 @@ import java.util.Scanner;
 
 public class MenuMultas {
 
-    private final Scanner scanner;
+    private final ConsolaUI ui;
 
-    public MenuMultas(Scanner scanner) {
-        this.scanner = scanner;
+    public MenuMultas(
+            Scanner scanner
+    ) {
+
+        this.ui =
+                new ConsolaUI(
+                        scanner
+                );
     }
 
     public void mostrarMultasDeUsuario(
@@ -26,7 +32,7 @@ public class MenuMultas {
 
         do {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -87,7 +93,7 @@ public class MenuMultas {
             );
 
             opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
             switch (opcion) {
 
@@ -130,7 +136,7 @@ public class MenuMultas {
 
                 default:
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Opcion invalida."
                     );
 
@@ -163,7 +169,7 @@ public class MenuMultas {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar las multas: "
                             + e.getMessage()
             );
@@ -200,7 +206,7 @@ public class MenuMultas {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar las multas: "
                             + e.getMessage()
             );
@@ -214,7 +220,7 @@ public class MenuMultas {
             String titulo
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println(
                 "╔════════════════════════════════════════════════════════════════════════════════════╗"
@@ -245,7 +251,7 @@ public class MenuMultas {
 
         if (multas.isEmpty()) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No hay multas para mostrar."
             );
 
@@ -291,7 +297,7 @@ public class MenuMultas {
                     "%-4d %-12s %-28s %-12d $%-11.2f %-12s %-12s%n",
                     i + 1,
                     multa.getCodigoMaterial(),
-                    recortarTexto(
+                    ui.recortarTexto(
                             multa.getTituloMaterial(),
                             28
                     ),
@@ -313,7 +319,7 @@ public class MenuMultas {
                 totalPendiente
         );
 
-        pausar();
+        ui.pausar();
     }
 
 
@@ -334,14 +340,14 @@ public class MenuMultas {
 
             if (pendientes.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El usuario no posee multas pendientes."
                 );
 
                 return;
             }
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println(
                     "╔════════════════════════════════════════════════════════════════════════════════════╗"
@@ -397,7 +403,7 @@ public class MenuMultas {
                         "%-4d %-12s %-28s %-12d $%-11.2f%n",
                         i + 1,
                         multa.getCodigoMaterial(),
-                        recortarTexto(
+                        ui.recortarTexto(
                                 multa.getTituloMaterial(),
                                 28
                         ),
@@ -420,7 +426,7 @@ public class MenuMultas {
             );
 
             int seleccion =
-                    leerEntero();
+                    ui.leerEntero();
 
             if (seleccion == 0) {
                 return;
@@ -431,7 +437,7 @@ public class MenuMultas {
                     || seleccion > pendientes.size()
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Seleccion invalida."
                 );
 
@@ -443,7 +449,7 @@ public class MenuMultas {
                             seleccion - 1
                     );
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -459,7 +465,7 @@ public class MenuMultas {
 
             System.out.printf(
                     "║ Material: %-32s║%n",
-                    recortarTexto(
+                    ui.recortarTexto(
                             multaSeleccionada.getTituloMaterial(),
                             32
                     )
@@ -496,7 +502,7 @@ public class MenuMultas {
             );
 
             int confirmacion =
-                    leerEntero();
+                    ui.leerEntero();
 
             if (confirmacion == 0) {
                 return;
@@ -504,7 +510,7 @@ public class MenuMultas {
 
             if (confirmacion != 1) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Opcion invalida."
                 );
 
@@ -518,44 +524,24 @@ public class MenuMultas {
 
             if (actualizado) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Pago registrado correctamente."
                 );
 
             } else {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "No se pudo registrar el pago."
                 );
             }
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al registrar el pago: "
                             + e.getMessage()
             );
         }
-    }
-
-
-    private String recortarTexto(
-            String texto,
-            int longitudMaxima
-    ) {
-
-        if (texto == null) {
-            return "-";
-        }
-
-        if (texto.length() <= longitudMaxima) {
-            return texto;
-        }
-
-        return texto.substring(
-                0,
-                longitudMaxima - 3
-        ) + "...";
     }
 
 
@@ -575,91 +561,5 @@ public class MenuMultas {
         return fecha.format(
                 formato
         );
-    }
-
-
-    private int leerEntero() {
-
-        while (true) {
-
-            try {
-
-                return Integer.parseInt(
-                        scanner.nextLine().trim()
-                );
-
-            } catch (NumberFormatException e) {
-
-                System.out.print(
-                        "Ingrese un numero valido: "
-                );
-            }
-        }
-    }
-
-
-    private void mostrarMensaje(
-            String mensaje
-    ) {
-
-        System.out.println();
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        System.out.println(
-                mensaje
-        );
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        pausar();
-    }
-
-
-    private void pausar() {
-
-        System.out.println();
-
-        System.out.print(
-                "Presione ENTER para continuar..."
-        );
-
-        scanner.nextLine();
-    }
-
-
-    private void limpiarPantalla() {
-
-        try {
-
-            if (System.getProperty("os.name")
-                    .toLowerCase()
-                    .contains("windows")) {
-
-                new ProcessBuilder(
-                        "cmd",
-                        "/c",
-                        "cls"
-                )
-                        .inheritIO()
-                        .start()
-                        .waitFor();
-
-            } else {
-
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-            }
-
-        } catch (Exception e) {
-
-            for (int i = 0; i < 30; i++) {
-                System.out.println();
-            }
-        }
     }
 }

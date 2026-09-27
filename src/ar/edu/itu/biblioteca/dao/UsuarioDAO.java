@@ -3,6 +3,7 @@ package ar.edu.itu.biblioteca.dao;
 import ar.edu.itu.biblioteca.database.ConexionBD;
 import ar.edu.itu.biblioteca.model.Docente;
 import ar.edu.itu.biblioteca.model.Estudiante;
+import ar.edu.itu.biblioteca.model.MotivoSuspension;
 import ar.edu.itu.biblioteca.model.Usuario;
 
 import java.sql.Connection;
@@ -27,9 +28,10 @@ public class UsuarioDAO {
                     apellido,
                     email,
                     tipo_usuario,
-                    activo
+                    activo,
+                    motivo_suspension
                 )
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (
@@ -72,6 +74,24 @@ public class UsuarioDAO {
                     6,
                     usuario.isActivo()
             );
+
+            if (
+                    usuario.getMotivoSuspension() == null
+            ) {
+
+                statement.setNull(
+                        7,
+                        java.sql.Types.VARCHAR
+                );
+
+            } else {
+
+                statement.setString(
+                        7,
+                        usuario.getMotivoSuspension()
+                                .name()
+                );
+            }
 
             statement.executeUpdate();
         }
@@ -133,7 +153,9 @@ public class UsuarioDAO {
 
         String sql = """
                 UPDATE usuarios
-                SET activo = ?
+                SET
+                    activo = ?,
+                    motivo_suspension = ?
                 WHERE id = ?
                 """;
 
@@ -150,8 +172,26 @@ public class UsuarioDAO {
                     usuario.isActivo()
             );
 
+            if (
+                    usuario.getMotivoSuspension() == null
+            ) {
+
+                statement.setNull(
+                        2,
+                        java.sql.Types.VARCHAR
+                );
+
+            } else {
+
+                statement.setString(
+                        2,
+                        usuario.getMotivoSuspension()
+                                .name()
+                );
+            }
+
             statement.setInt(
-                    2,
+                    3,
                     usuario.getId()
             );
 
@@ -175,7 +215,8 @@ public class UsuarioDAO {
                     apellido,
                     email,
                     tipo_usuario,
-                    activo
+                    activo,
+                    motivo_suspension
                 FROM usuarios
                 WHERE dni = ?
                 """;
@@ -225,7 +266,8 @@ public class UsuarioDAO {
                     apellido,
                     email,
                     tipo_usuario,
-                    activo
+                    activo,
+                    motivo_suspension
                 FROM usuarios
                 ORDER BY apellido, nombre
                 """;
@@ -270,16 +312,21 @@ public class UsuarioDAO {
                     apellido,
                     email,
                     tipo_usuario,
-                    activo
+                    activo,
+                    motivo_suspension
                 FROM usuarios
-                WHERE dni LIKE ?
-                   OR nombre LIKE ?
-                   OR apellido LIKE ?
+                WHERE UPPER(dni) LIKE ?
+                   OR UPPER(nombre) LIKE ?
+                   OR UPPER(apellido) LIKE ?
                 ORDER BY apellido, nombre
                 """;
 
         String criterio =
-                "%" + texto + "%";
+                "%"
+                        + texto
+                        .trim()
+                        .toUpperCase()
+                        + "%";
 
         try (
                 Connection conexion =
@@ -363,6 +410,11 @@ public class UsuarioDAO {
                         "activo"
                 );
 
+        String motivoTexto =
+                resultado.getString(
+                        "motivo_suspension"
+                );
+
         Usuario usuario;
 
         if (
@@ -372,13 +424,14 @@ public class UsuarioDAO {
                         )
         ) {
 
-            usuario = new Estudiante(
-                    id,
-                    dni,
-                    nombre,
-                    apellido,
-                    email
-            );
+            usuario =
+                    new Estudiante(
+                            id,
+                            dni,
+                            nombre,
+                            apellido,
+                            email
+                    );
 
         } else if (
                 "DOCENTE"
@@ -387,13 +440,14 @@ public class UsuarioDAO {
                         )
         ) {
 
-            usuario = new Docente(
-                    id,
-                    dni,
-                    nombre,
-                    apellido,
-                    email
-            );
+            usuario =
+                    new Docente(
+                            id,
+                            dni,
+                            nombre,
+                            apellido,
+                            email
+                    );
 
         } else {
 
@@ -406,6 +460,41 @@ public class UsuarioDAO {
         usuario.setActivo(
                 activo
         );
+
+        if (
+                !activo
+        ) {
+
+            MotivoSuspension motivo =
+                    MotivoSuspension.SIN_ESPECIFICAR;
+
+            if (
+                    motivoTexto != null
+                            && !motivoTexto.isBlank()
+            ) {
+
+                try {
+
+                    motivo =
+                            MotivoSuspension.valueOf(
+                                    motivoTexto
+                                            .trim()
+                                            .toUpperCase()
+                            );
+
+                } catch (
+                        IllegalArgumentException e
+                ) {
+
+                    motivo =
+                            MotivoSuspension.SIN_ESPECIFICAR;
+                }
+            }
+
+            usuario.setMotivoSuspension(
+                    motivo
+            );
+        }
 
         return usuario;
     }

@@ -1,8 +1,10 @@
 package ar.edu.itu.biblioteca.ui;
 
+import ar.edu.itu.biblioteca.dao.MultaDAO;
 import ar.edu.itu.biblioteca.dao.UsuarioDAO;
 import ar.edu.itu.biblioteca.model.Docente;
 import ar.edu.itu.biblioteca.model.Estudiante;
+import ar.edu.itu.biblioteca.model.MotivoSuspension;
 import ar.edu.itu.biblioteca.model.Usuario;
 
 import java.sql.SQLException;
@@ -12,9 +14,19 @@ import java.util.Scanner;
 public class MenuUsuarios {
 
     private final Scanner scanner;
+    private final ConsolaUI ui;
 
-    public MenuUsuarios(Scanner scanner) {
-        this.scanner = scanner;
+    public MenuUsuarios(
+            Scanner scanner
+    ) {
+
+        this.scanner =
+                scanner;
+
+        this.ui =
+                new ConsolaUI(
+                        scanner
+                );
     }
 
 
@@ -24,11 +36,11 @@ public class MenuUsuarios {
 
         do {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
             mostrarMenu();
 
             System.out.print("\nSeleccione una opcion: ");
-            opcion = leerEntero();
+            opcion = ui.leerEntero();
 
             switch (opcion) {
 
@@ -52,7 +64,7 @@ public class MenuUsuarios {
                     break;
 
                 default:
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Opcion invalida."
                     );
                     break;
@@ -81,7 +93,7 @@ public class MenuUsuarios {
 
         while (true) {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println("╔══════════════════════════════════════════════╗");
             System.out.println("║              REGISTRAR USUARIO              ║");
@@ -104,7 +116,7 @@ public class MenuUsuarios {
 
             if (!dni.matches("\\d{7,8}")) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El DNI debe contener solamente 7 u 8 numeros."
                 );
 
@@ -123,7 +135,7 @@ public class MenuUsuarios {
 
             if (nombre.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El nombre es obligatorio."
                 );
 
@@ -142,7 +154,7 @@ public class MenuUsuarios {
 
             if (apellido.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El apellido es obligatorio."
                 );
 
@@ -171,7 +183,7 @@ public class MenuUsuarios {
             );
 
             int tipo =
-                    leerEntero();
+                    ui.leerEntero();
 
             if (tipo == 0) {
                 return;
@@ -179,7 +191,7 @@ public class MenuUsuarios {
 
             if (tipo != 1 && tipo != 2) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Tipo de usuario invalido."
                 );
 
@@ -193,7 +205,7 @@ public class MenuUsuarios {
                             : "DOCENTE";
 
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println("╔══════════════════════════════════════════════╗");
             System.out.println("║           CONFIRMAR NUEVO USUARIO           ║");
@@ -237,7 +249,7 @@ public class MenuUsuarios {
             );
 
             int confirmacion =
-                    leerEntero();
+                    ui.leerEntero();
 
             if (confirmacion == 0) {
                 return;
@@ -249,7 +261,7 @@ public class MenuUsuarios {
 
             if (confirmacion != 1) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Opcion invalida."
                 );
 
@@ -290,7 +302,7 @@ public class MenuUsuarios {
                         usuario
                 );
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Usuario registrado correctamente."
                 );
 
@@ -305,13 +317,13 @@ public class MenuUsuarios {
                         )
                 ) {
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Ya existe un usuario registrado con ese DNI."
                     );
 
                 } else {
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "No se pudo registrar el usuario: "
                                     + e.getMessage()
                     );
@@ -325,7 +337,7 @@ public class MenuUsuarios {
 
     private void buscarUsuario() {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println("╔══════════════════════════════════════════════╗");
         System.out.println("║                BUSCAR USUARIO               ║");
@@ -340,7 +352,7 @@ public class MenuUsuarios {
 
         if (texto.isEmpty()) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Debe ingresar un criterio de busqueda."
             );
 
@@ -364,7 +376,7 @@ public class MenuUsuarios {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al buscar usuarios: "
                             + e.getMessage()
             );
@@ -388,7 +400,7 @@ public class MenuUsuarios {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al listar usuarios: "
                             + e.getMessage()
             );
@@ -398,7 +410,7 @@ public class MenuUsuarios {
 
     private void filtrarPorEstado() {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println("╔══════════════════════════════════════════════╗");
         System.out.println("║             FILTRAR POR ESTADO              ║");
@@ -413,7 +425,7 @@ public class MenuUsuarios {
         );
 
         int opcion =
-                leerEntero();
+                ui.leerEntero();
 
         if (opcion == 0) {
             return;
@@ -424,7 +436,7 @@ public class MenuUsuarios {
                         && opcion != 2
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Opcion invalida."
             );
 
@@ -458,7 +470,7 @@ public class MenuUsuarios {
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al filtrar usuarios: "
                             + e.getMessage()
             );
@@ -470,11 +482,11 @@ public class MenuUsuarios {
             List<Usuario> usuarios
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         if (usuarios.isEmpty()) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No se encontraron usuarios."
             );
 
@@ -554,7 +566,7 @@ public class MenuUsuarios {
         );
 
         int seleccion =
-                leerEntero();
+                ui.leerEntero();
 
         if (seleccion == 0) {
             return;
@@ -565,7 +577,7 @@ public class MenuUsuarios {
                         || seleccion > usuarios.size()
         ) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Seleccion invalida."
             );
 
@@ -592,7 +604,7 @@ public class MenuUsuarios {
 
         do {
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             String tipo =
                     usuario.getClass()
@@ -650,6 +662,22 @@ public class MenuUsuarios {
                     estado
             );
 
+            if (
+                    !usuario.isActivo()
+            ) {
+
+                String motivo =
+                        usuario.getMotivoSuspension() == null
+                                ? "SIN_ESPECIFICAR"
+                                : usuario.getMotivoSuspension()
+                                        .name();
+
+                System.out.printf(
+                        "║ Motivo:   %-34s║%n",
+                        motivo
+                );
+            }
+
             System.out.println(
                     "╠══════════════════════════════════════════════╣"
             );
@@ -675,6 +703,10 @@ public class MenuUsuarios {
             );
 
             System.out.println(
+                    "║  6. Registrar prestamo                      ║"
+            );
+
+            System.out.println(
                     "║                                              ║"
             );
 
@@ -691,7 +723,7 @@ public class MenuUsuarios {
             );
 
             opcion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             switch (opcion) {
@@ -752,11 +784,26 @@ public class MenuUsuarios {
 
                 case 5:
 
-                       cambiarEstadoUsuario(
-                             usuario
-                       );
+                    cambiarEstadoUsuario(
+                            usuario
+                    );
 
                     break;
+
+
+                case 6: {
+
+                    MenuPrestamos menuPrestamos =
+                            new MenuPrestamos(
+                                    scanner
+                            );
+
+                    menuPrestamos.registrarPrestamo(
+                            usuario
+                    );
+
+                    break;
+                }
 
 
                 case 0:
@@ -765,7 +812,7 @@ public class MenuUsuarios {
 
                 default:
 
-                    mostrarMensaje(
+                    ui.mostrarMensaje(
                             "Opcion invalida."
                     );
 
@@ -780,7 +827,7 @@ public class MenuUsuarios {
             Usuario usuario
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println(
                 "╔══════════════════════════════════════════════╗"
@@ -894,7 +941,7 @@ public class MenuUsuarios {
         }
 
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println(
                 "╔══════════════════════════════════════════════╗"
@@ -953,7 +1000,7 @@ public class MenuUsuarios {
 
 
         int confirmacion =
-                leerEntero();
+                ui.leerEntero();
 
         if (confirmacion == 0) {
             return;
@@ -961,7 +1008,7 @@ public class MenuUsuarios {
 
         if (confirmacion != 1) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Opcion invalida."
             );
 
@@ -1004,7 +1051,7 @@ public class MenuUsuarios {
 
             if (actualizado) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Datos modificados correctamente."
                 );
 
@@ -1022,7 +1069,7 @@ public class MenuUsuarios {
                         emailAnterior
                 );
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "No se pudo modificar el usuario."
                 );
             }
@@ -1041,7 +1088,7 @@ public class MenuUsuarios {
                     emailAnterior
             );
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al modificar los datos: "
                             + e.getMessage()
             );
@@ -1049,233 +1096,418 @@ public class MenuUsuarios {
     }
 
     private void cambiarEstadoUsuario(
-        Usuario usuario
-) {
+            Usuario usuario
+    ) {
 
-    limpiarPantalla();
+        ui.limpiarPantalla();
 
-    boolean estadoActual =
-            usuario.isActivo();
 
-    String estadoActualTexto =
-            estadoActual
-                    ? "ACTIVO"
-                    : "SUSPENDIDO";
+        boolean estadoActual =
+                usuario.isActivo();
 
-    String nuevoEstadoTexto =
-            estadoActual
-                    ? "SUSPENDIDO"
-                    : "ACTIVO";
 
-    System.out.println(
-            "╔══════════════════════════════════════════════╗"
-    );
+        if (
+                estadoActual
+        ) {
 
-    System.out.println(
-            "║              CAMBIAR ESTADO                 ║"
-    );
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
 
-    System.out.println(
-            "╠══════════════════════════════════════════════╣"
-    );
+            System.out.println(
+                    "║             SUSPENDER USUARIO               ║"
+            );
 
-    System.out.printf(
-            "║ Usuario: %-33s║%n",
-            usuario.getNombre()
-                    + " "
-                    + usuario.getApellido()
-    );
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
 
-    System.out.printf(
-            "║ DNI:     %-33s║%n",
-            usuario.getDni()
-    );
+            System.out.printf(
+                    "║ Usuario: %-33s║%n",
+                    ui.recortarTexto(
+                            usuario.getNombre()
+                                    + " "
+                                    + usuario.getApellido(),
+                            33
+                    )
+            );
 
-    System.out.printf(
-            "║ Estado actual: %-26s║%n",
-            estadoActualTexto
-    );
+            System.out.printf(
+                    "║ DNI:     %-33s║%n",
+                    usuario.getDni()
+            );
 
-    System.out.printf(
-            "║ Nuevo estado:  %-26s║%n",
-            nuevoEstadoTexto
-    );
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
 
-    System.out.println(
-            "╠══════════════════════════════════════════════╣"
-    );
+            System.out.println(
+                    "║ La suspension sera registrada como MANUAL.  ║"
+            );
 
-    System.out.println(
-            "║  1. Confirmar cambio                        ║"
-    );
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
 
-    System.out.println(
-            "║  0. Cancelar                                ║"
-    );
+            System.out.println(
+                    "║  1. Confirmar suspension                    ║"
+            );
 
-    System.out.println(
-            "╚══════════════════════════════════════════════╝"
-    );
+            System.out.println(
+                    "║  0. Cancelar                                ║"
+            );
 
-    System.out.print(
-            "\nSeleccione opcion: "
-    );
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
 
-    int confirmacion =
-            leerEntero();
+            System.out.print(
+                    "\nSeleccione opcion: "
+            );
 
-    if (confirmacion == 0) {
-        return;
-    }
 
-    if (confirmacion != 1) {
+            int confirmacion =
+                    ui.leerEntero();
 
-        mostrarMensaje(
-                "Opcion invalida."
-        );
 
-        return;
-    }
+            if (
+                    confirmacion == 0
+            ) {
 
-    boolean nuevoEstado =
-            !estadoActual;
+                return;
+            }
 
-    usuario.setActivo(
-            nuevoEstado
-    );
 
-    UsuarioDAO usuarioDAO =
-            new UsuarioDAO();
+            if (
+                    confirmacion != 1
+            ) {
 
-    try {
+                ui.mostrarMensaje(
+                        "Opcion invalida."
+                );
 
-        boolean actualizado =
+                return;
+            }
+
+
+            usuario.setActivo(
+                    false
+            );
+
+            usuario.setMotivoSuspension(
+                    MotivoSuspension.MANUAL
+            );
+
+
+            UsuarioDAO usuarioDAO =
+                    new UsuarioDAO();
+
+
+            try {
+
+                boolean actualizado =
+                        usuarioDAO.actualizarEstado(
+                                usuario
+                        );
+
+
+                if (
+                        actualizado
+                ) {
+
+                    ui.mostrarMensaje(
+                            "Usuario suspendido correctamente."
+                    );
+
+                } else {
+
+                    usuario.setActivo(
+                            true
+                    );
+
+                    ui.mostrarMensaje(
+                            "No se pudo actualizar el estado."
+                    );
+                }
+
+
+            } catch (SQLException e) {
+
+                usuario.setActivo(
+                        true
+                );
+
+                ui.mostrarMensaje(
+                        "Error al actualizar el estado: "
+                                + e.getMessage()
+                );
+            }
+
+
+            return;
+        }
+
+
+        /*
+         * Si queremos reactivar a un usuario suspendido,
+         * primero revisamos que no siga superando el umbral
+         * de multas pendientes.
+         */
+        MultaDAO multaDAO =
+                new MultaDAO();
+
+
+        double totalPendiente;
+
+
+        try {
+
+            totalPendiente =
+                    multaDAO
+                            .obtenerTotalPendientePorUsuario(
+                                    usuario.getId()
+                            );
+
+
+        } catch (SQLException e) {
+
+            ui.mostrarMensaje(
+                    "No se pudo verificar la deuda pendiente: "
+                            + e.getMessage()
+            );
+
+            return;
+        }
+
+
+        final double UMBRAL_SUSPENSION =
+                5000.0;
+
+
+        if (
+                totalPendiente
+                        > UMBRAL_SUSPENSION
+        ) {
+
+            usuario.setMotivoSuspension(
+                    MotivoSuspension.DEUDA
+            );
+
+
+            UsuarioDAO usuarioDAO =
+                    new UsuarioDAO();
+
+
+            try {
+
                 usuarioDAO.actualizarEstado(
                         usuario
                 );
 
-        if (actualizado) {
+            } catch (SQLException e) {
 
-            mostrarMensaje(
-                    "Estado actualizado correctamente."
-            );
-
-        } else {
-
-            usuario.setActivo(
-                    estadoActual
-            );
-
-            mostrarMensaje(
-                    "No se pudo actualizar el estado."
-            );
-        }
-
-    } catch (SQLException e) {
-
-        usuario.setActivo(
-                estadoActual
-        );
-
-        mostrarMensaje(
-                "Error al actualizar el estado: "
-                        + e.getMessage()
-        );
-    }
-}
-
-    private int leerEntero() {
-
-        while (true) {
-
-            try {
-
-                return Integer.parseInt(
-                        scanner.nextLine().trim()
+                ui.mostrarMensaje(
+                        "No se pudo actualizar el motivo de suspension: "
+                                + e.getMessage()
                 );
 
-            } catch (NumberFormatException e) {
-
-                System.out.print(
-                        "Ingrese un numero valido: "
-                );
+                return;
             }
+
+
+            ui.limpiarPantalla();
+
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║          REACTIVACION BLOQUEADA             ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.printf(
+                    "║ Deuda pendiente: $%-27.2f║%n",
+                    totalPendiente
+            );
+
+            System.out.printf(
+                    "║ Umbral:          $%-27.2f║%n",
+                    UMBRAL_SUSPENSION
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║ El monto pendiente supera el umbral.        ║"
+            );
+
+            System.out.println(
+                    "║ Primero deben regularizarse las multas.     ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            ui.pausar();
+
+            return;
         }
-    }
 
 
-    private void mostrarMensaje(
-            String mensaje
-    ) {
+        String motivoActual =
+                usuario.getMotivoSuspension() == null
+                        ? "SIN_ESPECIFICAR"
+                        : usuario.getMotivoSuspension()
+                                .name();
 
-        System.out.println();
+
+        ui.limpiarPantalla();
+
 
         System.out.println(
-                "────────────────────────────────────────────────"
+                "╔══════════════════════════════════════════════╗"
         );
 
         System.out.println(
-                mensaje
+                "║              REACTIVAR USUARIO              ║"
         );
 
         System.out.println(
-                "────────────────────────────────────────────────"
+                "╠══════════════════════════════════════════════╣"
         );
 
-        pausar();
-    }
+        System.out.printf(
+                "║ Usuario: %-33s║%n",
+                ui.recortarTexto(
+                        usuario.getNombre()
+                                + " "
+                                + usuario.getApellido(),
+                        33
+                )
+        );
 
+        System.out.printf(
+                "║ Motivo actual: %-27s║%n",
+                motivoActual
+        );
 
-    private void pausar() {
+        System.out.printf(
+                "║ Deuda pendiente: $%-27.2f║%n",
+                totalPendiente
+        );
 
-        System.out.println();
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
+
+        System.out.println(
+                "║  1. Confirmar reactivacion                  ║"
+        );
+
+        System.out.println(
+                "║  0. Cancelar                                ║"
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
 
         System.out.print(
-                "Presione ENTER para continuar..."
+                "\nSeleccione opcion: "
         );
 
-        scanner.nextLine();
-    }
+
+        int confirmacion =
+                ui.leerEntero();
 
 
-    private void limpiarPantalla() {
+        if (
+                confirmacion == 0
+        ) {
+
+            return;
+        }
+
+
+        if (
+                confirmacion != 1
+        ) {
+
+            ui.mostrarMensaje(
+                    "Opcion invalida."
+            );
+
+            return;
+        }
+
+
+        MotivoSuspension motivoAnterior =
+                usuario.getMotivoSuspension();
+
+
+        usuario.setActivo(
+                true
+        );
+
+
+        UsuarioDAO usuarioDAO =
+                new UsuarioDAO();
+
 
         try {
 
+            boolean actualizado =
+                    usuarioDAO.actualizarEstado(
+                            usuario
+                    );
+
+
             if (
-                    System.getProperty(
-                                    "os.name"
-                            )
-                            .toLowerCase()
-                            .contains(
-                                    "windows"
-                            )
+                    actualizado
             ) {
 
-                new ProcessBuilder(
-                        "cmd",
-                        "/c",
-                        "cls"
-                )
-                        .inheritIO()
-                        .start()
-                        .waitFor();
+                ui.mostrarMensaje(
+                        "Usuario reactivado correctamente."
+                );
 
             } else {
 
-                System.out.print(
-                        "\033[H\033[2J"
+                usuario.setActivo(
+                        false
                 );
 
-                System.out.flush();
+                usuario.setMotivoSuspension(
+                        motivoAnterior
+                );
+
+                ui.mostrarMensaje(
+                        "No se pudo actualizar el estado."
+                );
             }
 
-        } catch (Exception e) {
 
-            for (int i = 0; i < 30; i++) {
+        } catch (SQLException e) {
 
-                System.out.println();
-            }
+            usuario.setActivo(
+                    false
+            );
+
+            usuario.setMotivoSuspension(
+                    motivoAnterior
+            );
+
+            ui.mostrarMensaje(
+                    "Error al actualizar el estado: "
+                            + e.getMessage()
+            );
         }
     }
 }

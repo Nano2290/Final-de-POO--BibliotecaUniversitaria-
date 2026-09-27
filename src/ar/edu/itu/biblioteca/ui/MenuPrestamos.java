@@ -2,9 +2,9 @@ package ar.edu.itu.biblioteca.ui;
 
 import ar.edu.itu.biblioteca.dao.MaterialDAO;
 import ar.edu.itu.biblioteca.dao.PrestamoDAO;
-import ar.edu.itu.biblioteca.dao.UsuarioDAO;
 import ar.edu.itu.biblioteca.exception.BibliotecaException;
 import ar.edu.itu.biblioteca.model.MaterialBibliografico;
+import ar.edu.itu.biblioteca.model.MotivoSuspension;
 import ar.edu.itu.biblioteca.model.Prestamo;
 import ar.edu.itu.biblioteca.model.PrestamoMaterialResumen;
 import ar.edu.itu.biblioteca.model.PrestamoResumen;
@@ -20,14 +20,116 @@ import java.util.Scanner;
 public class MenuPrestamos {
 
     private final Scanner scanner;
+    private final ConsolaUI ui;
 
-    public MenuPrestamos(Scanner scanner) {
-        this.scanner = scanner;
+    public MenuPrestamos(
+            Scanner scanner
+    ) {
+
+        this.scanner =
+                scanner;
+
+        this.ui =
+                new ConsolaUI(
+                        scanner
+                );
     }
 
-    public void registrarPrestamo() {
+    public void iniciar() {
 
-        limpiarPantalla();
+        int opcion;
+
+        do {
+
+            ui.limpiarPantalla();
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║             GESTION DE PRESTAMOS            ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║  1. Registrar devolucion                    ║"
+            );
+
+            System.out.println(
+                    "║  2. Prestamos vencidos                      ║"
+            );
+
+            System.out.println(
+                    "║                                              ║"
+            );
+
+            System.out.println(
+                    "║  0. Volver                                  ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+
+            opcion =
+                    ui.leerEntero();
+
+
+            switch (opcion) {
+
+                case 1:
+
+                    ui.mostrarMensaje(
+                            "Registro de devoluciones: pendiente de implementar."
+                    );
+
+                    break;
+
+
+                case 2:
+
+                    ui.mostrarMensaje(
+                            "Prestamos vencidos: pendiente de implementar."
+                    );
+
+                    break;
+
+
+                case 0:
+
+                    break;
+
+
+                default:
+
+                    ui.mostrarMensaje(
+                            "Opcion invalida."
+                    );
+
+                    break;
+            }
+
+        } while (
+                opcion != 0
+        );
+    }
+
+
+    public void registrarPrestamo(
+            Usuario usuario
+    ) {
+
+        ui.limpiarPantalla();
+
 
         System.out.println(
                 "╔══════════════════════════════════════════════╗"
@@ -41,138 +143,41 @@ public class MenuPrestamos {
                 "╚══════════════════════════════════════════════╝"
         );
 
+
         System.out.println();
 
         System.out.println(
-                "Ingrese 0 para cancelar."
+                "Usuario: "
+                        + usuario.getNombre()
+                        + " "
+                        + usuario.getApellido()
         );
 
-        System.out.print(
-                "\nDNI del usuario: "
+        System.out.println(
+                "DNI: "
+                        + usuario.getDni()
         );
 
+        System.out.println(
+                "Estado: "
+                        + (
+                                usuario.isActivo()
+                                        ? "ACTIVO"
+                                        : "SUSPENDIDO"
+                        )
+        );
 
-        String dni =
-                scanner.nextLine()
-                        .trim();
-
-
-        if (
-                dni.equals("0")
-        ) {
-
-            return;
-        }
-
-
-        UsuarioDAO usuarioDAO =
-                new UsuarioDAO();
-
-        MaterialDAO materialDAO =
-                new MaterialDAO();
 
         PrestamoDAO prestamoDAO =
                 new PrestamoDAO();
 
-        PrestamoService prestamoService =
-                new PrestamoService();
+
+        int prestamosActivos;
 
 
         try {
 
-            Usuario usuario =
-                    usuarioDAO.buscarPorDni(
-                            dni
-                    );
-
-
-            if (
-                    usuario == null
-            ) {
-
-                mostrarMensaje(
-                        "No existe un usuario con ese DNI."
-                );
-
-                return;
-            }
-
-
-            System.out.println();
-
-            System.out.println(
-                    "Usuario: "
-                            + usuario.getNombre()
-                            + " "
-                            + usuario.getApellido()
-            );
-
-            System.out.println(
-                    "Estado: "
-                            + (
-                                    usuario.isActivo()
-                                            ? "ACTIVO"
-                                            : "SUSPENDIDO"
-                            )
-            );
-
-
-            System.out.print(
-                    "\nCodigo del material: "
-            );
-
-
-            String codigo =
-                    scanner.nextLine()
-                            .trim()
-                            .toUpperCase();
-
-
-            if (
-                    codigo.equals("0")
-            ) {
-
-                return;
-            }
-
-
-            MaterialBibliografico material =
-                    materialDAO.buscarPorCodigo(
-                            codigo
-                    );
-
-
-            if (
-                    material == null
-            ) {
-
-                mostrarMensaje(
-                        "No existe un material con ese codigo."
-                );
-
-                return;
-            }
-
-
-            System.out.println();
-
-            System.out.println(
-                    "Material: "
-                            + material.getTitulo()
-            );
-
-            System.out.println(
-                    "Tipo: "
-                            + material.obtenerTipoMaterial()
-            );
-
-            System.out.println(
-                    "Disponibles: "
-                            + material.getCantidadDisponible()
-            );
-
-
-            int prestamosActivos =
+            prestamosActivos =
                     prestamoDAO
                             .listarPrestamosActivosPorUsuario(
                                     usuario.getId()
@@ -180,15 +185,89 @@ public class MenuPrestamos {
                             .size();
 
 
-            /*
-             * El Service aplica las reglas de negocio:
-             * - usuario existente
-             * - usuario activo
-             * - limite de prestamos
-             * - material existente
-             * - disponibilidad
-             * - compatibilidad usuario/material
-             */
+        } catch (SQLException e) {
+
+            ui.mostrarMensaje(
+                    "No se pudo consultar el estado de prestamos del usuario: "
+                            + e.getMessage()
+            );
+
+            return;
+        }
+
+
+        /*
+         * Antes de pedir un material verificamos si el usuario
+         * ya tiene alguna condicion que impida el prestamo.
+         *
+         * El Service volvera a validar estas reglas al confirmar.
+         * Esta validacion previa existe para mejorar la experiencia
+         * de navegacion y no hacer buscar un material innecesariamente.
+         */
+        if (
+                !usuario.isActivo()
+        ) {
+
+            mostrarBloqueoUsuarioSuspendido(
+                    usuario,
+                    prestamosActivos
+            );
+
+            return;
+        }
+
+
+        if (
+                prestamosActivos
+                        >= usuario.obtenerLimitePrestamos()
+        ) {
+
+            mostrarBloqueoLimitePrestamos(
+                    usuario,
+                    prestamosActivos
+            );
+
+            return;
+        }
+
+
+        System.out.println();
+
+        System.out.println(
+                "Usuario habilitado para solicitar prestamos."
+        );
+
+        System.out.println(
+                "Prestamos activos: "
+                        + prestamosActivos
+                        + " de "
+                        + usuario.obtenerLimitePrestamos()
+        );
+
+
+        MaterialDAO materialDAO =
+                new MaterialDAO();
+
+        PrestamoService prestamoService =
+                new PrestamoService();
+
+
+        try {
+
+            MaterialBibliografico material =
+                    seleccionarMaterialParaPrestamo(
+                            materialDAO
+                    );
+
+
+            if (
+                    material == null
+            ) {
+
+                return;
+            }
+
+
             Prestamo prestamo =
                     prestamoService
                             .registrarPrestamo(
@@ -199,30 +278,82 @@ public class MenuPrestamos {
                             );
 
 
-            System.out.println();
+            ui.limpiarPantalla();
+
 
             System.out.println(
-                    "Fecha de inicio: "
-                            + formatearFecha(
-                                    prestamo.getFechaInicio()
-                            )
+                    "╔══════════════════════════════════════════════╗"
             );
 
             System.out.println(
-                    "Fecha de vencimiento: "
-                            + formatearFecha(
-                                    prestamo.getFechaVencimiento()
-                            )
-            );
-
-            System.out.println();
-
-            System.out.println(
-                    "1. Confirmar prestamo"
+                    "║            CONFIRMAR PRESTAMO               ║"
             );
 
             System.out.println(
-                    "0. Cancelar"
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.printf(
+                    "║ Usuario: %-33s║%n",
+                    ui.recortarTexto(
+                            usuario.getNombre()
+                                    + " "
+                                    + usuario.getApellido(),
+                            33
+                    )
+            );
+
+            System.out.printf(
+                    "║ DNI:     %-33s║%n",
+                    usuario.getDni()
+            );
+
+            System.out.printf(
+                    "║ Material:%-33s║%n",
+                    ui.recortarTexto(
+                            material.getTitulo(),
+                            33
+                    )
+            );
+
+            System.out.printf(
+                    "║ Codigo:  %-33s║%n",
+                    material.getCodigo()
+            );
+
+            System.out.printf(
+                    "║ Tipo:    %-33s║%n",
+                    material.obtenerTipoMaterial()
+            );
+
+            System.out.printf(
+                    "║ Inicio:  %-33s║%n",
+                    formatearFecha(
+                            prestamo.getFechaInicio()
+                    )
+            );
+
+            System.out.printf(
+                    "║ Vence:   %-33s║%n",
+                    formatearFecha(
+                            prestamo.getFechaVencimiento()
+                    )
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║  1. Confirmar                               ║"
+            );
+
+            System.out.println(
+                    "║  0. Cancelar                                ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
             );
 
             System.out.print(
@@ -231,7 +362,7 @@ public class MenuPrestamos {
 
 
             int confirmacion =
-                    leerEntero();
+                    ui.leerEntero();
 
 
             if (
@@ -246,7 +377,7 @@ public class MenuPrestamos {
                     confirmacion != 1
             ) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Opcion invalida."
                 );
 
@@ -254,32 +385,671 @@ public class MenuPrestamos {
             }
 
 
-            /*
-             * El DAO persiste el prestamo y actualiza
-             * la disponibilidad dentro de una transaccion.
-             */
             prestamoDAO.registrarPrestamo(
                     prestamo
             );
 
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Prestamo registrado correctamente."
             );
 
 
         } catch (BibliotecaException e) {
 
-            mostrarMensaje(
+            mostrarErrorPrestamoContextual(
+                    usuario,
                     e.getMessage()
             );
 
+
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "No se pudo registrar el prestamo: "
                             + e.getMessage()
             );
+        }
+    }
+
+
+    private void mostrarBloqueoUsuarioSuspendido(
+            Usuario usuario,
+            int prestamosActivos
+    ) {
+
+        MotivoSuspension motivo =
+                usuario.getMotivoSuspension() == null
+                        ? MotivoSuspension.SIN_ESPECIFICAR
+                        : usuario.getMotivoSuspension();
+
+
+        int opcion;
+
+        do {
+
+            ui.limpiarPantalla();
+
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║          PRESTAMO NO DISPONIBLE             ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.printf(
+                    "║ Usuario: %-33s║%n",
+                    ui.recortarTexto(
+                            usuario.getNombre()
+                                    + " "
+                                    + usuario.getApellido(),
+                            33
+                    )
+            );
+
+            System.out.printf(
+                    "║ Estado:  %-33s║%n",
+                    "SUSPENDIDO"
+            );
+
+            System.out.printf(
+                    "║ Motivo:  %-33s║%n",
+                    motivo.name()
+            );
+
+            System.out.printf(
+                    "║ Prestamos activos: %-24d║%n",
+                    prestamosActivos
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+
+            if (
+                    motivo == MotivoSuspension.DEUDA
+            ) {
+
+                System.out.println(
+                        "║ La suspension corresponde a deuda pendiente.║"
+                );
+
+                System.out.println(
+                        "║ No se puede registrar un nuevo prestamo.    ║"
+                );
+
+                System.out.println(
+                        "╠══════════════════════════════════════════════╣"
+                );
+
+                System.out.println(
+                        "║  1. Ver multas                              ║"
+                );
+
+                System.out.println(
+                        "║  2. Ver prestamos activos                   ║"
+                );
+
+                System.out.println(
+                        "║  3. Ver historial de prestamos              ║"
+                );
+
+            } else {
+
+                System.out.println(
+                        "║ La suspension no corresponde a deuda.       ║"
+                );
+
+                System.out.println(
+                        "║ Revise el estado desde la ficha del usuario.║"
+                );
+
+                System.out.println(
+                        "╠══════════════════════════════════════════════╣"
+                );
+
+                System.out.println(
+                        "║  1. Ver prestamos activos                   ║"
+                );
+
+                System.out.println(
+                        "║  2. Ver historial de prestamos              ║"
+                );
+            }
+
+
+            System.out.println(
+                    "║                                              ║"
+            );
+
+            System.out.println(
+                    "║  0. Volver a la ficha                       ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+
+            opcion =
+                    ui.leerEntero();
+
+
+            if (
+                    motivo == MotivoSuspension.DEUDA
+            ) {
+
+                switch (opcion) {
+
+                    case 1: {
+
+                        MenuMultas menuMultas =
+                                new MenuMultas(
+                                        scanner
+                                );
+
+                        menuMultas.mostrarMultasDeUsuario(
+                                usuario
+                        );
+
+                        break;
+                    }
+
+
+                    case 2:
+
+                        mostrarPrestamosActivos(
+                                usuario
+                        );
+
+                        break;
+
+
+                    case 3:
+
+                        mostrarHistorialPrestamos(
+                                usuario
+                        );
+
+                        break;
+
+
+                    case 0:
+
+                        break;
+
+
+                    default:
+
+                        ui.mostrarMensaje(
+                                "Opcion invalida."
+                        );
+
+                        break;
+                }
+
+            } else {
+
+                switch (opcion) {
+
+                    case 1:
+
+                        mostrarPrestamosActivos(
+                                usuario
+                        );
+
+                        break;
+
+
+                    case 2:
+
+                        mostrarHistorialPrestamos(
+                                usuario
+                        );
+
+                        break;
+
+
+                    case 0:
+
+                        break;
+
+
+                    default:
+
+                        ui.mostrarMensaje(
+                                "Opcion invalida."
+                        );
+
+                        break;
+                }
+            }
+
+        } while (
+                opcion != 0
+        );
+    }
+
+
+    private void mostrarBloqueoLimitePrestamos(
+            Usuario usuario,
+            int prestamosActivos
+    ) {
+
+        int opcion;
+
+        do {
+
+            ui.limpiarPantalla();
+
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║          LIMITE DE PRESTAMOS                ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.printf(
+                    "║ Usuario: %-33s║%n",
+                    ui.recortarTexto(
+                            usuario.getNombre()
+                                    + " "
+                                    + usuario.getApellido(),
+                            33
+                    )
+            );
+
+            System.out.printf(
+                    "║ Prestamos activos: %-24d║%n",
+                    prestamosActivos
+            );
+
+            System.out.printf(
+                    "║ Limite permitido: %-24d║%n",
+                    usuario.obtenerLimitePrestamos()
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║ El usuario alcanzo su limite de prestamos.  ║"
+            );
+
+            System.out.println(
+                    "║ Debe devolver material antes de continuar.  ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║  1. Ver prestamos activos                   ║"
+            );
+
+            System.out.println(
+                    "║  2. Ver historial de prestamos              ║"
+            );
+
+            System.out.println(
+                    "║                                              ║"
+            );
+
+            System.out.println(
+                    "║  0. Volver a la ficha                       ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+
+            opcion =
+                    ui.leerEntero();
+
+
+            switch (opcion) {
+
+                case 1:
+
+                    mostrarPrestamosActivos(
+                            usuario
+                    );
+
+                    break;
+
+
+                case 2:
+
+                    mostrarHistorialPrestamos(
+                            usuario
+                    );
+
+                    break;
+
+
+                case 0:
+
+                    break;
+
+
+                default:
+
+                    ui.mostrarMensaje(
+                            "Opcion invalida."
+                    );
+
+                    break;
+            }
+
+        } while (
+                opcion != 0
+        );
+    }
+
+
+    private void mostrarErrorPrestamoContextual(
+            Usuario usuario,
+            String mensaje
+    ) {
+
+        int opcion;
+
+        do {
+
+            ui.limpiarPantalla();
+
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║            PRESTAMO RECHAZADO               ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println();
+
+            System.out.println(
+                    mensaje
+            );
+
+            System.out.println();
+
+            System.out.println(
+                    "1. Intentar con otro material"
+            );
+
+            System.out.println(
+                    "2. Ver prestamos activos del usuario"
+            );
+
+            System.out.println(
+                    "0. Volver a la ficha"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+
+            opcion =
+                    ui.leerEntero();
+
+
+            switch (opcion) {
+
+                case 1:
+
+                    registrarPrestamo(
+                            usuario
+                    );
+
+                    return;
+
+
+                case 2:
+
+                    mostrarPrestamosActivos(
+                            usuario
+                    );
+
+                    break;
+
+
+                case 0:
+
+                    break;
+
+
+                default:
+
+                    ui.mostrarMensaje(
+                            "Opcion invalida."
+                    );
+
+                    break;
+            }
+
+        } while (
+                opcion != 0
+        );
+    }
+
+
+    private MaterialBibliografico seleccionarMaterialParaPrestamo(
+            MaterialDAO materialDAO
+    ) throws SQLException {
+
+        while (true) {
+
+            System.out.println();
+
+            System.out.println(
+                    "Buscar material por codigo o titulo."
+            );
+
+            System.out.println(
+                    "Puede escribir solo una parte del titulo."
+            );
+
+            System.out.println(
+                    "Ingrese 0 para cancelar."
+            );
+
+            System.out.print(
+                    "\nBuscar material: "
+            );
+
+
+            String texto =
+                    scanner.nextLine()
+                            .trim();
+
+
+            if (
+                    texto.equals("0")
+            ) {
+
+                return null;
+            }
+
+
+            if (
+                    texto.isEmpty()
+            ) {
+
+                ui.mostrarMensaje(
+                        "Debe ingresar un criterio de busqueda."
+                );
+
+                continue;
+            }
+
+
+            List<MaterialBibliografico> materiales =
+                    materialDAO
+                            .buscarCoincidencias(
+                                    texto
+                            );
+
+
+            if (
+                    materiales.isEmpty()
+            ) {
+
+                ui.mostrarMensaje(
+                        "No se encontraron materiales coincidentes."
+                );
+
+                continue;
+            }
+
+
+            if (
+                    materiales.size() == 1
+            ) {
+
+                return materiales.get(
+                        0
+                );
+            }
+
+
+            while (true) {
+
+                ui.limpiarPantalla();
+
+
+                System.out.println(
+                        "╔══════════════════════════════════════════════════════════════════════════════╗"
+                );
+
+                System.out.println(
+                        "║                    SELECCIONAR MATERIAL PARA PRESTAMO                     ║"
+                );
+
+                System.out.println(
+                        "╚══════════════════════════════════════════════════════════════════════════════╝"
+                );
+
+                System.out.println();
+
+                System.out.println(
+                        "--------------------------------------------------------------------------------"
+                );
+
+                System.out.printf(
+                        "%-4s %-12s %-32s %-12s %-10s%n",
+                        "Nro",
+                        "Codigo",
+                        "Titulo",
+                        "Tipo",
+                        "Dispon."
+                );
+
+                System.out.println(
+                        "--------------------------------------------------------------------------------"
+                );
+
+
+                for (
+                        int i = 0;
+                        i < materiales.size();
+                        i++
+                ) {
+
+                    MaterialBibliografico material =
+                            materiales.get(
+                                    i
+                            );
+
+
+                    System.out.printf(
+                            "%-4d %-12s %-32s %-12s %-10d%n",
+                            i + 1,
+                            material.getCodigo(),
+                            ui.recortarTexto(
+                                    material.getTitulo(),
+                                    32
+                            ),
+                            material.obtenerTipoMaterial(),
+                            material.getCantidadDisponible()
+                    );
+                }
+
+
+                System.out.println(
+                        "--------------------------------------------------------------------------------"
+                );
+
+                System.out.println();
+
+                System.out.println(
+                        "0. Cancelar"
+                );
+
+                System.out.print(
+                        "\nSeleccione un material: "
+                );
+
+
+                int opcion =
+                        ui.leerEntero();
+
+
+                if (
+                        opcion == 0
+                ) {
+
+                    return null;
+                }
+
+
+                if (
+                        opcion < 1
+                                || opcion > materiales.size()
+                ) {
+
+                    ui.mostrarMensaje(
+                            "Seleccion invalida."
+                    );
+
+                    continue;
+                }
+
+
+                return materiales.get(
+                        opcion - 1
+                );
+            }
         }
     }
 
@@ -288,7 +1058,7 @@ public class MenuPrestamos {
             Usuario usuario
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println(
                 "╔══════════════════════════════════════════════════════════════════════════════╗"
@@ -328,7 +1098,7 @@ public class MenuPrestamos {
 
             if (prestamos.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El usuario no posee prestamos activos."
                 );
 
@@ -359,7 +1129,7 @@ public class MenuPrestamos {
                 System.out.printf(
                         "%-12s %-30s %-12s %-12s %-12s%n",
                         prestamo.getCodigoMaterial(),
-                        recortarTexto(
+                        ui.recortarTexto(
                                 prestamo.getTituloMaterial(),
                                 30
                         ),
@@ -377,11 +1147,11 @@ public class MenuPrestamos {
                     "--------------------------------------------------------------------------------------"
             );
 
-            pausar();
+            ui.pausar();
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar los prestamos activos: "
                             + e.getMessage()
             );
@@ -392,7 +1162,7 @@ public class MenuPrestamos {
             Usuario usuario
     ) {
 
-        limpiarPantalla();
+        ui.limpiarPantalla();
 
         System.out.println(
                 "╔══════════════════════════════════════════════════════════════════════════════╗"
@@ -432,7 +1202,7 @@ public class MenuPrestamos {
 
             if (historial.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "El usuario no posee prestamos registrados."
                 );
 
@@ -469,7 +1239,7 @@ public class MenuPrestamos {
                 System.out.printf(
                         "%-12s %-30s %-12s %-12s %-12s %-12s%n",
                         prestamo.getCodigoMaterial(),
-                        recortarTexto(
+                        ui.recortarTexto(
                                 prestamo.getTituloMaterial(),
                                 30
                         ),
@@ -488,11 +1258,11 @@ public class MenuPrestamos {
                     "----------------------------------------------------------------------------------------------------"
             );
 
-            pausar();
+            ui.pausar();
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar el historial: "
                             + e.getMessage()
             );
@@ -513,7 +1283,7 @@ public class MenuPrestamos {
                             material.getId()
                     );
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println(
                     "╔══════════════════════════════════════════════════════════════════════════════════════════╗"
@@ -541,7 +1311,7 @@ public class MenuPrestamos {
 
             if (prestamos.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Actualmente nadie tiene prestado este material."
                 );
 
@@ -580,7 +1350,7 @@ public class MenuPrestamos {
                 System.out.printf(
                         "%-4d %-24s %-12s %-14s %-14s %-12s%n",
                         i + 1,
-                        recortarTexto(
+                        ui.recortarTexto(
                                 prestamo.getNombreCompletoUsuario(),
                                 24
                         ),
@@ -599,11 +1369,11 @@ public class MenuPrestamos {
                     "------------------------------------------------------------------------------------------------"
             );
 
-            pausar();
+            ui.pausar();
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar prestamos activos: "
                             + e.getMessage()
             );
@@ -624,7 +1394,7 @@ public class MenuPrestamos {
                             material.getId()
                     );
 
-            limpiarPantalla();
+            ui.limpiarPantalla();
 
             System.out.println(
                     "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗"
@@ -652,7 +1422,7 @@ public class MenuPrestamos {
 
             if (historial.isEmpty()) {
 
-                mostrarMensaje(
+                ui.mostrarMensaje(
                         "Este material todavia no tiene prestamos registrados."
                 );
 
@@ -692,7 +1462,7 @@ public class MenuPrestamos {
                 System.out.printf(
                         "%-4d %-22s %-12s %-12s %-12s %-12s %-12s%n",
                         i + 1,
-                        recortarTexto(
+                        ui.recortarTexto(
                                 prestamo.getNombreCompletoUsuario(),
                                 22
                         ),
@@ -714,34 +1484,15 @@ public class MenuPrestamos {
                     "----------------------------------------------------------------------------------------------------------"
             );
 
-            pausar();
+            ui.pausar();
 
         } catch (SQLException e) {
 
-            mostrarMensaje(
+            ui.mostrarMensaje(
                     "Error al consultar historial del material: "
                             + e.getMessage()
             );
         }
-    }
-
-    private String recortarTexto(
-            String texto,
-            int longitudMaxima
-    ) {
-
-        if (texto == null) {
-            return "-";
-        }
-
-        if (texto.length() <= longitudMaxima) {
-            return texto;
-        }
-
-        return texto.substring(
-                0,
-                longitudMaxima - 3
-        ) + "...";
     }
 
     private String formatearFecha(
@@ -760,88 +1511,5 @@ public class MenuPrestamos {
         return fecha.format(
                 formato
         );
-    }
-
-    private int leerEntero() {
-
-        while (true) {
-
-            try {
-
-                return Integer.parseInt(
-                        scanner.nextLine()
-                                .trim()
-                );
-
-            } catch (NumberFormatException e) {
-
-                System.out.print(
-                        "Ingrese un numero valido: "
-                );
-            }
-        }
-    }
-
-
-    private void mostrarMensaje(
-            String mensaje
-    ) {
-
-        System.out.println();
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        System.out.println(
-                mensaje
-        );
-
-        System.out.println(
-                "────────────────────────────────────────────────"
-        );
-
-        pausar();
-    }
-
-    private void pausar() {
-
-        System.out.println();
-
-        System.out.print(
-                "Presione ENTER para continuar..."
-        );
-
-        scanner.nextLine();
-    }
-
-    private void limpiarPantalla() {
-
-        try {
-
-            if (System.getProperty("os.name")
-                    .toLowerCase()
-                    .contains("windows")) {
-
-                new ProcessBuilder(
-                        "cmd",
-                        "/c",
-                        "cls"
-                )
-                        .inheritIO()
-                        .start()
-                        .waitFor();
-
-            } else {
-
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-            }
-
-        } catch (Exception e) {
-
-            for (int i = 0; i < 30; i++) {
-                System.out.println();
-            }
-        }
     }
 }

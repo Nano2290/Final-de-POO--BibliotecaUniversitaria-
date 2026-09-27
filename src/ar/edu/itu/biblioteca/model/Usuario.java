@@ -8,6 +8,7 @@ public abstract class Usuario {
     private String apellido;
     private String email;
     private boolean activo;
+    private MotivoSuspension motivoSuspension;
 
     public Usuario(
             int id,
@@ -23,6 +24,7 @@ public abstract class Usuario {
         this.apellido = apellido;
         this.email = email;
         this.activo = true;
+        this.motivoSuspension = null;
     }
 
     public int getId() {
@@ -49,6 +51,10 @@ public abstract class Usuario {
         return activo;
     }
 
+    public MotivoSuspension getMotivoSuspension() {
+        return motivoSuspension;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
@@ -63,6 +69,16 @@ public abstract class Usuario {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+
+        if (activo) {
+            this.motivoSuspension = null;
+        }
+    }
+
+    public void setMotivoSuspension(
+            MotivoSuspension motivoSuspension
+    ) {
+        this.motivoSuspension = motivoSuspension;
     }
 
     public abstract int obtenerLimitePrestamos();

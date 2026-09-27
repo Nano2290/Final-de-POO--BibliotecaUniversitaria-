@@ -227,7 +227,9 @@ public class PrestamoDAO {
 
         String sqlSuspenderUsuario = """
                 UPDATE usuarios
-                SET activo = FALSE
+                SET
+                    activo = FALSE,
+                    motivo_suspension = 'DEUDA'
                 WHERE id = ?
                 """;
 
@@ -481,7 +483,7 @@ public class PrestamoDAO {
 
                 if (
                         totalMultas
-                                >= UMBRAL_SUSPENSION
+                                > UMBRAL_SUSPENSION
                 ) {
 
                     try (
