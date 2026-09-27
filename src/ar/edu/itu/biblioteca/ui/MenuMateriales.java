@@ -1,17 +1,13 @@
 package ar.edu.itu.biblioteca.ui;
 
 import ar.edu.itu.biblioteca.dao.MaterialDAO;
-import ar.edu.itu.biblioteca.dao.PrestamoDAO;
 
 import ar.edu.itu.biblioteca.model.Libro;
 import ar.edu.itu.biblioteca.model.MaterialBibliografico;
-import ar.edu.itu.biblioteca.model.PrestamoMaterialResumen;
 import ar.edu.itu.biblioteca.model.Revista;
 
 import java.sql.SQLException;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 import java.util.Scanner;
@@ -25,12 +21,6 @@ public class MenuMateriales {
      * hasta el menu principal.
      */
     private boolean volverMenuPrincipal = false;
-
-
-    private static final DateTimeFormatter FORMATO_FECHA =
-            DateTimeFormatter.ofPattern(
-                    "dd/MM/yyyy"
-            );
 
 
     public MenuMateriales(
@@ -898,10 +888,6 @@ public class MenuMateriales {
                     "0. Volver"
             );
 
-            System.out.println(
-                    "9. Menu principal"
-            );
-
             System.out.print(
                     "\nSeleccione un material: "
             );
@@ -914,17 +900,6 @@ public class MenuMateriales {
             if (
                     opcion == 0
             ) {
-
-                return;
-            }
-
-
-            if (
-                    opcion == 9
-            ) {
-
-                volverMenuPrincipal =
-                        true;
 
                 return;
             }
@@ -1074,22 +1049,36 @@ public class MenuMateriales {
 
             switch (opcion) {
 
-                case 1:
+                case 1: {
 
-                    mostrarPrestamosActivosDelMaterial(
-                            material
-                    );
+                    MenuPrestamos menuPrestamos =
+                            new MenuPrestamos(
+                                    scanner
+                            );
 
-                    break;
-
-
-                case 2:
-
-                    mostrarHistorialDelMaterial(
-                            material
-                    );
+                    menuPrestamos
+                            .mostrarPrestamosActivosPorMaterial(
+                                    material
+                            );
 
                     break;
+                }
+
+
+                case 2: {
+
+                    MenuPrestamos menuPrestamos =
+                            new MenuPrestamos(
+                                    scanner
+                            );
+
+                    menuPrestamos
+                            .mostrarHistorialPorMaterial(
+                                    material
+                            );
+
+                    break;
+                }
 
 
                 case 0:
@@ -1113,277 +1102,6 @@ public class MenuMateriales {
 
                     break;
             }
-        }
-    }
-
-
-    /*
-     * Muestra las personas que actualmente
-     * tienen un ejemplar de este material.
-     */
-    private void mostrarPrestamosActivosDelMaterial(
-            MaterialBibliografico material
-    ) {
-
-        PrestamoDAO prestamoDAO =
-                new PrestamoDAO();
-
-
-        try {
-
-            List<PrestamoMaterialResumen> prestamos =
-                    prestamoDAO
-                            .listarPrestamosActivosPorMaterial(
-                                    material.getId()
-                            );
-
-
-            limpiarPantalla();
-
-
-            System.out.println(
-                    "╔══════════════════════════════════════════════════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║                               PRESTAMOS ACTIVOS                                         ║"
-            );
-
-            System.out.println(
-                    "╚══════════════════════════════════════════════════════════════════════════════════════════╝"
-            );
-
-
-            System.out.println();
-
-            System.out.println(
-                    "Material: "
-                            + material.getTitulo()
-            );
-
-            System.out.println(
-                    "Codigo:   "
-                            + material.getCodigo()
-            );
-
-
-            if (
-                    prestamos.isEmpty()
-            ) {
-
-                mostrarMensaje(
-                        "Actualmente nadie tiene prestado este material."
-                );
-
-                return;
-            }
-
-
-            System.out.println();
-
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
-
-            System.out.printf(
-                    "%-4s %-24s %-12s %-14s %-14s %-12s%n",
-                    "Nro",
-                    "Usuario",
-                    "DNI",
-                    "Prestamo",
-                    "Vencimiento",
-                    "Estado"
-            );
-
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
-
-
-            for (
-                    int i = 0;
-                    i < prestamos.size();
-                    i++
-            ) {
-
-                PrestamoMaterialResumen prestamo =
-                        prestamos.get(
-                                i
-                        );
-
-
-                System.out.printf(
-                        "%-4d %-24s %-12s %-14s %-14s %-12s%n",
-                        i + 1,
-                        recortarTexto(
-                                prestamo
-                                        .getNombreCompletoUsuario(),
-                                24
-                        ),
-                        prestamo.getDniUsuario(),
-                        formatearFecha(
-                                prestamo.getFechaInicio()
-                        ),
-                        formatearFecha(
-                                prestamo.getFechaVencimiento()
-                        ),
-                        prestamo.obtenerEstado()
-                );
-            }
-
-
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
-
-
-            pausar();
-
-
-        } catch (SQLException e) {
-
-            mostrarMensaje(
-                    "Error al consultar prestamos activos: "
-                            + e.getMessage()
-            );
-        }
-    }
-
-
-    /*
-     * Historial completo del material.
-     * Incluye prestamos activos, vencidos
-     * y ya devueltos.
-     */
-    private void mostrarHistorialDelMaterial(
-            MaterialBibliografico material
-    ) {
-
-        PrestamoDAO prestamoDAO =
-                new PrestamoDAO();
-
-
-        try {
-
-            List<PrestamoMaterialResumen> historial =
-                    prestamoDAO
-                            .listarHistorialPorMaterial(
-                                    material.getId()
-                            );
-
-
-            limpiarPantalla();
-
-
-            System.out.println(
-                    "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║                                      HISTORIAL DE PRESTAMOS                                             ║"
-            );
-
-            System.out.println(
-                    "╚══════════════════════════════════════════════════════════════════════════════════════════════════════════╝"
-            );
-
-
-            System.out.println();
-
-            System.out.println(
-                    "Material: "
-                            + material.getTitulo()
-            );
-
-            System.out.println(
-                    "Codigo:   "
-                            + material.getCodigo()
-            );
-
-
-            if (
-                    historial.isEmpty()
-            ) {
-
-                mostrarMensaje(
-                        "Este material todavia no tiene prestamos registrados."
-                );
-
-                return;
-            }
-
-
-            System.out.println();
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
-
-            System.out.printf(
-                    "%-4s %-22s %-12s %-12s %-12s %-12s %-12s%n",
-                    "Nro",
-                    "Usuario",
-                    "DNI",
-                    "Inicio",
-                    "Vence",
-                    "Devolucion",
-                    "Estado"
-            );
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
-
-
-            for (
-                    int i = 0;
-                    i < historial.size();
-                    i++
-            ) {
-
-                PrestamoMaterialResumen prestamo =
-                        historial.get(
-                                i
-                        );
-
-
-                System.out.printf(
-                        "%-4d %-22s %-12s %-12s %-12s %-12s %-12s%n",
-                        i + 1,
-                        recortarTexto(
-                                prestamo
-                                        .getNombreCompletoUsuario(),
-                                22
-                        ),
-                        prestamo.getDniUsuario(),
-                        formatearFecha(
-                                prestamo.getFechaInicio()
-                        ),
-                        formatearFecha(
-                                prestamo.getFechaVencimiento()
-                        ),
-                        formatearFecha(
-                                prestamo.getFechaDevolucion()
-                        ),
-                        prestamo.obtenerEstado()
-                );
-            }
-
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
-
-
-            pausar();
-
-
-        } catch (SQLException e) {
-
-            mostrarMensaje(
-                    "Error al consultar historial del material: "
-                            + e.getMessage()
-            );
         }
     }
 
@@ -1492,24 +1210,6 @@ public class MenuMateriales {
                 );
             }
         }
-    }
-
-
-    private String formatearFecha(
-            LocalDate fecha
-    ) {
-
-        if (
-                fecha == null
-        ) {
-
-            return "-";
-        }
-
-
-        return fecha.format(
-                FORMATO_FECHA
-        );
     }
 
 
