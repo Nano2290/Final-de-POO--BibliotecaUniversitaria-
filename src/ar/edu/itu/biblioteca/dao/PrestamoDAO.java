@@ -16,7 +16,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import ar.edu.itu.biblioteca.model.PrestamoResumen;
-
+import ar.edu.itu.biblioteca.model.PrestamoMaterialResumen;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -760,6 +760,190 @@ public class PrestamoDAO {
     }
 
     return prestamosActivos;
+}
+public List<PrestamoMaterialResumen>
+listarPrestamosActivosPorMaterial(
+        int materialId
+) throws SQLException {
+
+    List<PrestamoMaterialResumen> prestamos =
+            new ArrayList<>();
+
+
+    String sql = """
+            SELECT
+                p.id AS prestamo_id,
+                u.dni,
+                u.nombre,
+                u.apellido,
+                p.fecha_inicio,
+                p.fecha_vencimiento,
+                p.fecha_devolucion
+            FROM prestamos p
+            INNER JOIN usuarios u
+                ON p.usuario_id = u.id
+            WHERE p.material_id = ?
+            AND p.fecha_devolucion IS NULL
+            ORDER BY p.fecha_vencimiento ASC
+            """;
+
+
+    try (
+            Connection conexion =
+                    ConexionBD.obtenerConexion();
+
+            PreparedStatement statement =
+                    conexion.prepareStatement(
+                            sql
+                    )
+    ) {
+
+        statement.setInt(
+                1,
+                materialId
+        );
+
+
+        try (
+                ResultSet resultado =
+                        statement.executeQuery()
+        ) {
+
+            while (
+                    resultado.next()
+            ) {
+
+                PrestamoMaterialResumen resumen =
+                        new PrestamoMaterialResumen(
+                                resultado.getInt(
+                                        "prestamo_id"
+                                ),
+                                resultado.getString(
+                                        "dni"
+                                ),
+                                resultado.getString(
+                                        "nombre"
+                                ),
+                                resultado.getString(
+                                        "apellido"
+                                ),
+                                resultado.getDate(
+                                        "fecha_inicio"
+                                ).toLocalDate(),
+                                resultado.getDate(
+                                        "fecha_vencimiento"
+                                ).toLocalDate(),
+                                null
+                        );
+
+
+                prestamos.add(
+                        resumen
+                );
+            }
+        }
+    }
+
+
+    return prestamos;
+}
+public List<PrestamoMaterialResumen>
+listarHistorialPorMaterial(
+        int materialId
+) throws SQLException {
+
+    List<PrestamoMaterialResumen> historial =
+            new ArrayList<>();
+
+
+    String sql = """
+            SELECT
+                p.id AS prestamo_id,
+                u.dni,
+                u.nombre,
+                u.apellido,
+                p.fecha_inicio,
+                p.fecha_vencimiento,
+                p.fecha_devolucion
+            FROM prestamos p
+            INNER JOIN usuarios u
+                ON p.usuario_id = u.id
+            WHERE p.material_id = ?
+            ORDER BY p.fecha_inicio DESC
+            """;
+
+
+    try (
+            Connection conexion =
+                    ConexionBD.obtenerConexion();
+
+            PreparedStatement statement =
+                    conexion.prepareStatement(
+                            sql
+                    )
+    ) {
+
+        statement.setInt(
+                1,
+                materialId
+        );
+
+
+        try (
+                ResultSet resultado =
+                        statement.executeQuery()
+        ) {
+
+            while (
+                    resultado.next()
+            ) {
+
+                Date fechaDevolucionSql =
+                        resultado.getDate(
+                                "fecha_devolucion"
+                        );
+
+
+                LocalDate fechaDevolucion =
+                        fechaDevolucionSql == null
+                                ? null
+                                : fechaDevolucionSql
+                                        .toLocalDate();
+
+
+                PrestamoMaterialResumen resumen =
+                        new PrestamoMaterialResumen(
+                                resultado.getInt(
+                                        "prestamo_id"
+                                ),
+                                resultado.getString(
+                                        "dni"
+                                ),
+                                resultado.getString(
+                                        "nombre"
+                                ),
+                                resultado.getString(
+                                        "apellido"
+                                ),
+                                resultado.getDate(
+                                        "fecha_inicio"
+                                ).toLocalDate(),
+                                resultado.getDate(
+                                        "fecha_vencimiento"
+                                ).toLocalDate(),
+                                fechaDevolucion
+                        );
+
+
+                historial.add(
+                        resumen
+                );
+            }
+        }
+    }
+
+
+    return historial;
 }
 
     private void cerrarConexion(

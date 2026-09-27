@@ -61,10 +61,13 @@ public class MenuPrincipal {
                 break;
 
             case 2:
-                mostrarMensaje(
-                        "Modulo de gestion de materiales."
-                );
-                break;
+
+                 MenuMateriales menuMateriales =
+                         new MenuMateriales(scanner);
+
+                         menuMateriales.iniciar();
+
+                 break;
 
             case 3:
                 mostrarMensaje(
