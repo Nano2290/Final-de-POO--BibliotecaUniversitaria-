@@ -7,7 +7,11 @@ public class MenuPrincipal {
     private final Scanner scanner;
 
     public MenuPrincipal() {
-        scanner = new Scanner(System.in);
+
+        scanner =
+                new Scanner(
+                        System.in
+                );
     }
 
     public void iniciar() {
@@ -17,90 +21,162 @@ public class MenuPrincipal {
         do {
 
             limpiarPantalla();
+
             mostrarEncabezado();
 
-            System.out.println("║  1. Gestion de usuarios                     ║");
-            System.out.println("║  2. Gestion de materiales                   ║");
-            System.out.println("║  3. Registrar prestamo                      ║");
-            System.out.println("║  4. Registrar devolucion                    ║");
-            System.out.println("║  5. Prestamos vencidos                      ║");
-            System.out.println("║  6. Gestion de multas                       ║");
-            System.out.println("║                                              ║");
-            System.out.println("║  0. Salir                                   ║");
-            System.out.println("╚══════════════════════════════════════════════╝");
+            System.out.println(
+                    "║  1. Gestion de usuarios                     ║"
+            );
 
-            System.out.print("\nSeleccione una opcion: ");
+            System.out.println(
+                    "║  2. Gestion de materiales                   ║"
+            );
 
-            opcion = leerEntero();
+            System.out.println(
+                    "║  3. Registrar prestamo                      ║"
+            );
 
-            procesarOpcion(opcion);
+            System.out.println(
+                    "║  4. Registrar devolucion                    ║"
+            );
 
-        } while (opcion != 0);
+            System.out.println(
+                    "║  5. Prestamos vencidos                      ║"
+            );
+
+            System.out.println(
+                    "║  6. Gestion de multas                       ║"
+            );
+
+            System.out.println(
+                    "║                                              ║"
+            );
+
+            System.out.println(
+                    "║  0. Salir                                   ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+            opcion =
+                    leerEntero();
+
+            procesarOpcion(
+                    opcion
+            );
+
+        } while (
+                opcion != 0
+        );
 
         scanner.close();
     }
 
+
     private void mostrarEncabezado() {
 
-        System.out.println("╔══════════════════════════════════════════════╗");
-        System.out.println("║       BIBLIOTECA UNIVERSITARIA - ITU        ║");
-        System.out.println("╠══════════════════════════════════════════════╣");
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║       BIBLIOTECA UNIVERSITARIA - ITU        ║"
+        );
+
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
     }
 
-    private void procesarOpcion(int opcion) {
+
+    private void procesarOpcion(
+            int opcion
+    ) {
 
         switch (opcion) {
 
-            case 1:
+            case 1: {
 
-                 MenuUsuarios menuUsuarios =
-                        new MenuUsuarios(scanner);
+                MenuUsuarios menuUsuarios =
+                        new MenuUsuarios(
+                                scanner
+                        );
 
-                 menuUsuarios.iniciar();
+                menuUsuarios.iniciar();
 
                 break;
+            }
 
-            case 2:
 
-                 MenuMateriales menuMateriales =
-                         new MenuMateriales(scanner);
+            case 2: {
 
-                         menuMateriales.iniciar();
+                MenuMateriales menuMateriales =
+                        new MenuMateriales(
+                                scanner
+                        );
 
-                 break;
+                menuMateriales.iniciar();
 
-            case 3:
-                mostrarMensaje(
-                        "Registro de prestamos."
-                );
                 break;
+            }
+
+
+            case 3: {
+
+                MenuPrestamos menuPrestamos =
+                        new MenuPrestamos(
+                                scanner
+                        );
+
+                menuPrestamos.registrarPrestamo();
+
+                break;
+            }
+
 
             case 4:
+
                 mostrarMensaje(
                         "Registro de devoluciones."
                 );
+
                 break;
 
+
             case 5:
+
                 mostrarMensaje(
                         "Consulta de prestamos vencidos."
                 );
+
                 break;
 
+
             case 6:
+
                 mostrarMensaje(
                         "Gestion de multas."
                 );
+
                 break;
+
 
             case 0:
 
                 System.out.println();
+
                 System.out.println(
                         "Gracias por utilizar Biblioteca Universitaria."
                 );
 
                 break;
+
 
             default:
 
@@ -112,6 +188,7 @@ public class MenuPrincipal {
         }
     }
 
+
     private int leerEntero() {
 
         while (true) {
@@ -119,10 +196,13 @@ public class MenuPrincipal {
             try {
 
                 return Integer.parseInt(
-                        scanner.nextLine().trim()
+                        scanner.nextLine()
+                                .trim()
                 );
 
-            } catch (NumberFormatException e) {
+            } catch (
+                    NumberFormatException e
+            ) {
 
                 System.out.print(
                         "Ingrese un numero valido: "
@@ -131,19 +211,33 @@ public class MenuPrincipal {
         }
     }
 
-    private void mostrarMensaje(String mensaje) {
+
+    private void mostrarMensaje(
+            String mensaje
+    ) {
 
         System.out.println();
-        System.out.println("────────────────────────────────────────────────");
-        System.out.println(mensaje);
-        System.out.println("────────────────────────────────────────────────");
+
+        System.out.println(
+                "────────────────────────────────────────────────"
+        );
+
+        System.out.println(
+                mensaje
+        );
+
+        System.out.println(
+                "────────────────────────────────────────────────"
+        );
 
         pausar();
     }
 
+
     private void pausar() {
 
         System.out.println();
+
         System.out.print(
                 "Presione ENTER para continuar..."
         );
@@ -151,9 +245,15 @@ public class MenuPrincipal {
         scanner.nextLine();
     }
 
+
     private void limpiarPantalla() {
 
-        for (int i = 0; i < 30; i++) {
+        for (
+                int i = 0;
+                i < 30;
+                i++
+        ) {
+
             System.out.println();
         }
     }

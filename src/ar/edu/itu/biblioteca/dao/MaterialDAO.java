@@ -4,6 +4,7 @@ import ar.edu.itu.biblioteca.database.ConexionBD;
 import ar.edu.itu.biblioteca.model.Libro;
 import ar.edu.itu.biblioteca.model.MaterialBibliografico;
 import ar.edu.itu.biblioteca.model.Revista;
+import ar.edu.itu.biblioteca.model.Tesis;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -69,6 +70,145 @@ public class MaterialDAO {
     }
 
 
+    public void agregarEjemplares(
+            int materialId,
+            int cantidad
+    ) throws SQLException {
+
+        if (cantidad <= 0) {
+
+            throw new SQLException(
+                    "La cantidad debe ser mayor que cero."
+            );
+        }
+
+
+        String sql = """
+                UPDATE materiales
+                SET
+                    cantidad_total = cantidad_total + ?,
+                    cantidad_disponible = cantidad_disponible + ?
+                WHERE id = ?
+                """;
+
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    cantidad
+            );
+
+            statement.setInt(
+                    2,
+                    cantidad
+            );
+
+            statement.setInt(
+                    3,
+                    materialId
+            );
+
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+
+            if (
+                    filasAfectadas == 0
+            ) {
+
+                throw new SQLException(
+                        "No se encontro el material a actualizar."
+                );
+            }
+        }
+    }
+
+
+    public void quitarEjemplares(
+            int materialId,
+            int cantidad
+    ) throws SQLException {
+
+        if (
+                cantidad <= 0
+        ) {
+
+            throw new SQLException(
+                    "La cantidad debe ser mayor que cero."
+            );
+        }
+
+
+        String sql = """
+                UPDATE materiales
+                SET
+                    cantidad_total = cantidad_total - ?,
+                    cantidad_disponible = cantidad_disponible - ?
+                WHERE id = ?
+                  AND cantidad_disponible >= ?
+                  AND cantidad_total >= ?
+                """;
+
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(sql)
+        ) {
+
+            statement.setInt(
+                    1,
+                    cantidad
+            );
+
+            statement.setInt(
+                    2,
+                    cantidad
+            );
+
+            statement.setInt(
+                    3,
+                    materialId
+            );
+
+            statement.setInt(
+                    4,
+                    cantidad
+            );
+
+            statement.setInt(
+                    5,
+                    cantidad
+            );
+
+
+            int filasAfectadas =
+                    statement.executeUpdate();
+
+
+            if (
+                    filasAfectadas == 0
+            ) {
+
+                throw new SQLException(
+                        "No se pueden quitar esa cantidad de ejemplares. "
+                                + "Solo se pueden retirar ejemplares disponibles."
+                );
+            }
+        }
+    }
+
+
     public String generarCodigoSugerido(
             String tipoMaterial
     ) throws SQLException {
@@ -90,6 +230,14 @@ public class MaterialDAO {
         ) {
 
             prefijo = "REV";
+
+        } else if (
+                "TESIS".equalsIgnoreCase(
+                        tipoMaterial
+                )
+        ) {
+
+            prefijo = "TES";
 
         } else {
 
@@ -147,9 +295,9 @@ public class MaterialDAO {
 
                     if (
                             codigo != null
-                            && codigo.matches(
-                                    prefijo + "\\d{4}"
-                            )
+                                    && codigo.matches(
+                                            prefijo + "\\d{4}"
+                                    )
                     ) {
 
                         String parteNumerica =
@@ -263,8 +411,8 @@ public class MaterialDAO {
         String patron =
                 "%"
                         + texto
-                                .trim()
-                                .toUpperCase()
+                        .trim()
+                        .toUpperCase()
                         + "%";
 
 
@@ -418,6 +566,20 @@ public class MaterialDAO {
 
             material =
                     new Revista(
+                            id,
+                            codigo,
+                            titulo,
+                            cantidadTotal
+                    );
+
+        } else if (
+                "TESIS".equalsIgnoreCase(
+                        tipoMaterial
+                )
+        ) {
+
+            material =
+                    new Tesis(
                             id,
                             codigo,
                             titulo,

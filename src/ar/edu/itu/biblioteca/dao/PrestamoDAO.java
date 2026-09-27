@@ -563,7 +563,7 @@ public class PrestamoDAO {
             }
 
             /*
-             * 8. CONFIRMAMOS TODO
+             * 8. CONFIRMAMOS 
              */
 
             conexion.commit();

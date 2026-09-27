@@ -5,9 +5,9 @@ import ar.edu.itu.biblioteca.dao.MaterialDAO;
 import ar.edu.itu.biblioteca.model.Libro;
 import ar.edu.itu.biblioteca.model.MaterialBibliografico;
 import ar.edu.itu.biblioteca.model.Revista;
+import ar.edu.itu.biblioteca.model.Tesis;
 
 import java.sql.SQLException;
-
 
 import java.util.List;
 import java.util.Scanner;
@@ -221,6 +221,10 @@ public class MenuMateriales {
             );
 
             System.out.println(
+                    "3. Tesis"
+            );
+
+            System.out.println(
                     "0. Cancelar"
             );
 
@@ -242,6 +246,7 @@ public class MenuMateriales {
             if (
                     tipo != 1
                             && tipo != 2
+                            && tipo != 3
             ) {
 
                 mostrarMensaje(
@@ -252,10 +257,27 @@ public class MenuMateriales {
             }
 
 
-            String tipoTexto =
+            String tipoTexto;
+
+            if (
                     tipo == 1
-                            ? "LIBRO"
-                            : "REVISTA";
+            ) {
+
+                tipoTexto =
+                        "LIBRO";
+
+            } else if (
+                    tipo == 2
+            ) {
+
+                tipoTexto =
+                        "REVISTA";
+
+            } else {
+
+                tipoTexto =
+                        "TESIS";
+            }
 
 
             MaterialDAO materialDAO =
@@ -536,7 +558,7 @@ public class MenuMateriales {
              * Polimorfismo:
              * la variable es MaterialBibliografico,
              * pero el objeto concreto puede ser
-             * Libro o Revista.
+             * Libro, Revista o Tesis.
              */
 
             MaterialBibliografico material;
@@ -554,10 +576,22 @@ public class MenuMateriales {
                                 cantidad
                         );
 
-            } else {
+            } else if (
+                    tipo == 2
+            ) {
 
                 material =
                         new Revista(
+                                0,
+                                codigo,
+                                titulo,
+                                cantidad
+                        );
+
+            } else {
+
+                material =
+                        new Tesis(
                                 0,
                                 codigo,
                                 titulo,
@@ -1022,6 +1056,14 @@ public class MenuMateriales {
             );
 
             System.out.println(
+                    "║  3. Agregar ejemplares                      ║"
+            );
+
+            System.out.println(
+                    "║  4. Quitar ejemplares                       ║"
+            );
+
+            System.out.println(
                     "║                                              ║"
             );
 
@@ -1081,6 +1123,24 @@ public class MenuMateriales {
                 }
 
 
+                case 3:
+
+                    agregarEjemplares(
+                            material
+                    );
+
+                    break;
+
+
+                case 4:
+
+                    quitarEjemplares(
+                            material
+                    );
+
+                    break;
+
+
                 case 0:
 
                     return;
@@ -1102,6 +1162,421 @@ public class MenuMateriales {
 
                     break;
             }
+        }
+    }
+
+
+    private void agregarEjemplares(
+            MaterialBibliografico material
+    ) {
+
+        limpiarPantalla();
+
+
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║             AGREGAR EJEMPLARES              ║"
+        );
+
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
+
+        System.out.printf(
+                "║ Codigo:      %-31s║%n",
+                material.getCodigo()
+        );
+
+        mostrarTextoLargoEnFicha(
+                "Titulo:",
+                material.getTitulo()
+        );
+
+        System.out.printf(
+                "║ Total actual:%-31d║%n",
+                material.getCantidadTotal()
+        );
+
+        System.out.printf(
+                "║ Disponibles: %-31d║%n",
+                material.getCantidadDisponible()
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
+
+
+        System.out.println();
+
+        System.out.println(
+                "Ingrese 0 para cancelar."
+        );
+
+        System.out.print(
+                "\nCantidad de ejemplares a agregar: "
+        );
+
+
+        int cantidad =
+                leerEntero();
+
+
+        if (
+                cantidad == 0
+        ) {
+
+            return;
+        }
+
+
+        if (
+                cantidad < 1
+        ) {
+
+            mostrarMensaje(
+                    "La cantidad debe ser mayor que cero."
+            );
+
+            return;
+        }
+
+
+        System.out.println();
+
+        System.out.println(
+                "Se agregaran "
+                        + cantidad
+                        + " ejemplares."
+        );
+
+        System.out.println(
+                "Nuevo total: "
+                        + (
+                                material.getCantidadTotal()
+                                        + cantidad
+                        )
+        );
+
+        System.out.println(
+                "Nuevos disponibles: "
+                        + (
+                                material.getCantidadDisponible()
+                                        + cantidad
+                        )
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "1. Confirmar"
+        );
+
+        System.out.println(
+                "0. Cancelar"
+        );
+
+        System.out.print(
+                "\nSeleccione una opcion: "
+        );
+
+
+        int confirmacion =
+                leerEntero();
+
+
+        if (
+                confirmacion == 0
+        ) {
+
+            return;
+        }
+
+
+        if (
+                confirmacion != 1
+        ) {
+
+            mostrarMensaje(
+                    "Opcion invalida."
+            );
+
+            return;
+        }
+
+
+        MaterialDAO materialDAO =
+                new MaterialDAO();
+
+
+        try {
+
+            materialDAO
+                    .agregarEjemplares(
+                            material.getId(),
+                            cantidad
+                    );
+
+
+            /*
+             * Actualizamos tambien el objeto que ya esta
+             * cargado en memoria. De esta manera la ficha
+             * y el listado muestran los nuevos valores sin
+             * tener que reiniciar el programa.
+             */
+            material.agregarEjemplares(
+                    cantidad
+            );
+
+
+            mostrarMensaje(
+                    "Ejemplares agregados correctamente."
+            );
+
+
+        } catch (SQLException e) {
+
+            mostrarMensaje(
+                    "No se pudieron agregar los ejemplares: "
+                            + e.getMessage()
+            );
+        }
+    }
+
+
+    private void quitarEjemplares(
+            MaterialBibliografico material
+    ) {
+
+        limpiarPantalla();
+
+
+        int prestados =
+                material.getCantidadTotal()
+                        - material.getCantidadDisponible();
+
+
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║              QUITAR EJEMPLARES              ║"
+        );
+
+        System.out.println(
+                "╠══════════════════════════════════════════════╣"
+        );
+
+        System.out.printf(
+                "║ Codigo:      %-31s║%n",
+                material.getCodigo()
+        );
+
+        mostrarTextoLargoEnFicha(
+                "Titulo:",
+                material.getTitulo()
+        );
+
+        System.out.printf(
+                "║ Total actual:%-31d║%n",
+                material.getCantidadTotal()
+        );
+
+        System.out.printf(
+                "║ Disponibles: %-31d║%n",
+                material.getCantidadDisponible()
+        );
+
+        System.out.printf(
+                "║ Prestados:   %-31d║%n",
+                prestados
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
+
+
+        if (
+                material.getCantidadDisponible() == 0
+        ) {
+
+            mostrarMensaje(
+                    "No hay ejemplares disponibles para quitar."
+            );
+
+            return;
+        }
+
+
+        System.out.println();
+
+        System.out.println(
+                "Solo se pueden quitar ejemplares disponibles."
+        );
+
+        System.out.println(
+                "Maximo que puede quitar: "
+                        + material.getCantidadDisponible()
+        );
+
+        System.out.println(
+                "Ingrese 0 para cancelar."
+        );
+
+        System.out.print(
+                "\nCantidad de ejemplares a quitar: "
+        );
+
+
+        int cantidad =
+                leerEntero();
+
+
+        if (
+                cantidad == 0
+        ) {
+
+            return;
+        }
+
+
+        if (
+                cantidad < 1
+        ) {
+
+            mostrarMensaje(
+                    "La cantidad debe ser mayor que cero."
+            );
+
+            return;
+        }
+
+
+        if (
+                cantidad > material.getCantidadDisponible()
+        ) {
+
+            mostrarMensaje(
+                    "No se pueden quitar "
+                            + cantidad
+                            + " ejemplares. Solo hay "
+                            + material.getCantidadDisponible()
+                            + " disponibles."
+            );
+
+            return;
+        }
+
+
+        System.out.println();
+
+        System.out.println(
+                "Se quitaran "
+                        + cantidad
+                        + " ejemplares."
+        );
+
+        System.out.println(
+                "Nuevo total: "
+                        + (
+                                material.getCantidadTotal()
+                                        - cantidad
+                        )
+        );
+
+        System.out.println(
+                "Nuevos disponibles: "
+                        + (
+                                material.getCantidadDisponible()
+                                        - cantidad
+                        )
+        );
+
+        System.out.println(
+                "Prestados: "
+                        + prestados
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "1. Confirmar"
+        );
+
+        System.out.println(
+                "0. Cancelar"
+        );
+
+        System.out.print(
+                "\nSeleccione una opcion: "
+        );
+
+
+        int confirmacion =
+                leerEntero();
+
+
+        if (
+                confirmacion == 0
+        ) {
+
+            return;
+        }
+
+
+        if (
+                confirmacion != 1
+        ) {
+
+            mostrarMensaje(
+                    "Opcion invalida."
+            );
+
+            return;
+        }
+
+
+        MaterialDAO materialDAO =
+                new MaterialDAO();
+
+
+        try {
+
+            materialDAO
+                    .quitarEjemplares(
+                            material.getId(),
+                            cantidad
+                    );
+
+
+            /*
+             * Mantenemos sincronizado el objeto que ya esta
+             * cargado en memoria con lo que se guardo en BD.
+             */
+            material.quitarEjemplares(
+                    cantidad
+            );
+
+
+            mostrarMensaje(
+                    "Ejemplares quitados correctamente."
+            );
+
+
+        } catch (
+                SQLException
+                        | IllegalArgumentException e
+        ) {
+
+            mostrarMensaje(
+                    "No se pudieron quitar los ejemplares: "
+                            + e.getMessage()
+            );
         }
     }
 

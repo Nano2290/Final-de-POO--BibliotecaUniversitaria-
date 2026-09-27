@@ -1,10 +1,15 @@
 package ar.edu.itu.biblioteca.ui;
 
+import ar.edu.itu.biblioteca.dao.MaterialDAO;
 import ar.edu.itu.biblioteca.dao.PrestamoDAO;
+import ar.edu.itu.biblioteca.dao.UsuarioDAO;
+import ar.edu.itu.biblioteca.exception.BibliotecaException;
 import ar.edu.itu.biblioteca.model.MaterialBibliografico;
+import ar.edu.itu.biblioteca.model.Prestamo;
 import ar.edu.itu.biblioteca.model.PrestamoMaterialResumen;
 import ar.edu.itu.biblioteca.model.PrestamoResumen;
 import ar.edu.itu.biblioteca.model.Usuario;
+import ar.edu.itu.biblioteca.service.PrestamoService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -19,6 +24,265 @@ public class MenuPrestamos {
     public MenuPrestamos(Scanner scanner) {
         this.scanner = scanner;
     }
+
+    public void registrarPrestamo() {
+
+        limpiarPantalla();
+
+        System.out.println(
+                "╔══════════════════════════════════════════════╗"
+        );
+
+        System.out.println(
+                "║              REGISTRAR PRESTAMO             ║"
+        );
+
+        System.out.println(
+                "╚══════════════════════════════════════════════╝"
+        );
+
+        System.out.println();
+
+        System.out.println(
+                "Ingrese 0 para cancelar."
+        );
+
+        System.out.print(
+                "\nDNI del usuario: "
+        );
+
+
+        String dni =
+                scanner.nextLine()
+                        .trim();
+
+
+        if (
+                dni.equals("0")
+        ) {
+
+            return;
+        }
+
+
+        UsuarioDAO usuarioDAO =
+                new UsuarioDAO();
+
+        MaterialDAO materialDAO =
+                new MaterialDAO();
+
+        PrestamoDAO prestamoDAO =
+                new PrestamoDAO();
+
+        PrestamoService prestamoService =
+                new PrestamoService();
+
+
+        try {
+
+            Usuario usuario =
+                    usuarioDAO.buscarPorDni(
+                            dni
+                    );
+
+
+            if (
+                    usuario == null
+            ) {
+
+                mostrarMensaje(
+                        "No existe un usuario con ese DNI."
+                );
+
+                return;
+            }
+
+
+            System.out.println();
+
+            System.out.println(
+                    "Usuario: "
+                            + usuario.getNombre()
+                            + " "
+                            + usuario.getApellido()
+            );
+
+            System.out.println(
+                    "Estado: "
+                            + (
+                                    usuario.isActivo()
+                                            ? "ACTIVO"
+                                            : "SUSPENDIDO"
+                            )
+            );
+
+
+            System.out.print(
+                    "\nCodigo del material: "
+            );
+
+
+            String codigo =
+                    scanner.nextLine()
+                            .trim()
+                            .toUpperCase();
+
+
+            if (
+                    codigo.equals("0")
+            ) {
+
+                return;
+            }
+
+
+            MaterialBibliografico material =
+                    materialDAO.buscarPorCodigo(
+                            codigo
+                    );
+
+
+            if (
+                    material == null
+            ) {
+
+                mostrarMensaje(
+                        "No existe un material con ese codigo."
+                );
+
+                return;
+            }
+
+
+            System.out.println();
+
+            System.out.println(
+                    "Material: "
+                            + material.getTitulo()
+            );
+
+            System.out.println(
+                    "Tipo: "
+                            + material.obtenerTipoMaterial()
+            );
+
+            System.out.println(
+                    "Disponibles: "
+                            + material.getCantidadDisponible()
+            );
+
+
+            int prestamosActivos =
+                    prestamoDAO
+                            .listarPrestamosActivosPorUsuario(
+                                    usuario.getId()
+                            )
+                            .size();
+
+
+            /*
+             * El Service aplica las reglas de negocio:
+             * - usuario existente
+             * - usuario activo
+             * - limite de prestamos
+             * - material existente
+             * - disponibilidad
+             * - compatibilidad usuario/material
+             */
+            Prestamo prestamo =
+                    prestamoService
+                            .registrarPrestamo(
+                                    0,
+                                    usuario,
+                                    material,
+                                    prestamosActivos
+                            );
+
+
+            System.out.println();
+
+            System.out.println(
+                    "Fecha de inicio: "
+                            + formatearFecha(
+                                    prestamo.getFechaInicio()
+                            )
+            );
+
+            System.out.println(
+                    "Fecha de vencimiento: "
+                            + formatearFecha(
+                                    prestamo.getFechaVencimiento()
+                            )
+            );
+
+            System.out.println();
+
+            System.out.println(
+                    "1. Confirmar prestamo"
+            );
+
+            System.out.println(
+                    "0. Cancelar"
+            );
+
+            System.out.print(
+                    "\nSeleccione una opcion: "
+            );
+
+
+            int confirmacion =
+                    leerEntero();
+
+
+            if (
+                    confirmacion == 0
+            ) {
+
+                return;
+            }
+
+
+            if (
+                    confirmacion != 1
+            ) {
+
+                mostrarMensaje(
+                        "Opcion invalida."
+                );
+
+                return;
+            }
+
+
+            /*
+             * El DAO persiste el prestamo y actualiza
+             * la disponibilidad dentro de una transaccion.
+             */
+            prestamoDAO.registrarPrestamo(
+                    prestamo
+            );
+
+
+            mostrarMensaje(
+                    "Prestamo registrado correctamente."
+            );
+
+
+        } catch (BibliotecaException e) {
+
+            mostrarMensaje(
+                    e.getMessage()
+            );
+
+        } catch (SQLException e) {
+
+            mostrarMensaje(
+                    "No se pudo registrar el prestamo: "
+                            + e.getMessage()
+            );
+        }
+    }
+
 
     public void mostrarPrestamosActivos(
             Usuario usuario
@@ -497,6 +761,27 @@ public class MenuPrestamos {
                 formato
         );
     }
+
+    private int leerEntero() {
+
+        while (true) {
+
+            try {
+
+                return Integer.parseInt(
+                        scanner.nextLine()
+                                .trim()
+                );
+
+            } catch (NumberFormatException e) {
+
+                System.out.print(
+                        "Ingrese un numero valido: "
+                );
+            }
+        }
+    }
+
 
     private void mostrarMensaje(
             String mensaje
