@@ -16,158 +16,210 @@ import java.util.Scanner;
 
 public class ConsultaPrestamosUI {
 
+    private final Scanner scanner;
     private final ConsolaUI ui;
 
-
-    public ConsultaPrestamosUI(
-            Scanner scanner
-    ) {
-
-        this.ui =
-                new ConsolaUI(
-                        scanner
-                );
+    public ConsultaPrestamosUI(Scanner scanner) {
+        this.scanner = scanner;
+        this.ui = new ConsolaUI(scanner);
     }
 
+    public void mostrarPrestamosActivos(Usuario usuario) {
 
-    public void mostrarPrestamosActivos(
-            Usuario usuario
-    ) {
+        while (true) {
 
-        ui.limpiarPantalla();
+            ui.limpiarPantalla();
 
-        System.out.println(
-                "╔══════════════════════════════════════════════════════════════════════════════╗"
-        );
+            System.out.println("╔════════════════════════════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                                   PRESTAMOS ACTIVOS                                       ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════════════════════════════════╝");
 
-        System.out.println(
-                "║                         PRESTAMOS ACTIVOS                                  ║"
-        );
+            System.out.println();
+            System.out.println("Usuario: " + usuario.getNombre() + " " + usuario.getApellido());
+            System.out.println("DNI: " + usuario.getDni());
 
-        System.out.println(
-                "╚══════════════════════════════════════════════════════════════════════════════╝"
-        );
+            PrestamoDAO prestamoDAO = new PrestamoDAO();
 
-        System.out.println();
+            try {
 
-        System.out.println(
-                "Usuario: "
-                        + usuario.getNombre()
-                        + " "
-                        + usuario.getApellido()
-        );
+                List<PrestamoResumen> prestamos =
+                        prestamoDAO.listarPrestamosActivosPorUsuario(
+                                usuario.getId()
+                        );
 
-        System.out.println(
-                "DNI: "
-                        + usuario.getDni()
-        );
+                if (prestamos.isEmpty()) {
+                    ui.mostrarMensaje("El usuario no posee prestamos activos.");
+                    return;
+                }
 
-        PrestamoDAO prestamoDAO =
-                new PrestamoDAO();
+                System.out.println();
+                System.out.println("--------------------------------------------------------------------------------------------");
 
-        try {
+                System.out.printf(
+                        "%-4s %-12s %-30s %-12s %-12s %-12s%n",
+                        "Nro",
+                        "Codigo",
+                        "Material",
+                        "Inicio",
+                        "Vence",
+                        "Estado"
+                );
 
-            List<PrestamoResumen> prestamos =
-                    prestamoDAO.listarPrestamosActivosPorUsuario(
-                            usuario.getId()
+                System.out.println("--------------------------------------------------------------------------------------------");
+
+                for (int i = 0; i < prestamos.size(); i++) {
+
+                    PrestamoResumen prestamo = prestamos.get(i);
+
+                    System.out.printf(
+                            "%-4d %-12s %-30s %-12s %-12s %-12s%n",
+                            i + 1,
+                            prestamo.getCodigoMaterial(),
+                            ui.recortarTexto(
+                                    prestamo.getTituloMaterial(),
+                                    30
+                            ),
+                            formatearFecha(
+                                    prestamo.getFechaInicio()
+                            ),
+                            formatearFecha(
+                                    prestamo.getFechaVencimiento()
+                            ),
+                            prestamo.obtenerEstado()
                     );
+                }
 
-            if (prestamos.isEmpty()) {
+                System.out.println("--------------------------------------------------------------------------------------------");
+                System.out.println();
+                System.out.println("0. Volver");
+
+                System.out.print("\nSeleccione un prestamo: ");
+
+                int opcion = ui.leerEntero();
+
+                if (opcion == 0) {
+                    return;
+                }
+
+                if (opcion < 1 || opcion > prestamos.size()) {
+                    ui.mostrarMensaje("Seleccion invalida.");
+                    continue;
+                }
+
+                PrestamoResumen prestamoSeleccionado =
+                        prestamos.get(opcion - 1);
+
+                mostrarFichaPrestamoActivo(
+                        usuario,
+                        prestamoSeleccionado
+                );
+
+            } catch (SQLException e) {
 
                 ui.mostrarMensaje(
-                        "El usuario no posee prestamos activos."
+                        "Error al consultar los prestamos activos: "
+                                + e.getMessage()
                 );
 
                 return;
             }
-
-            System.out.println();
-
-            System.out.println(
-                    "--------------------------------------------------------------------------------------"
-            );
-
-            System.out.printf(
-                    "%-12s %-30s %-12s %-12s %-12s%n",
-                    "Codigo",
-                    "Material",
-                    "Inicio",
-                    "Vence",
-                    "Estado"
-            );
-
-            System.out.println(
-                    "--------------------------------------------------------------------------------------"
-            );
-
-            for (PrestamoResumen prestamo : prestamos) {
-
-                System.out.printf(
-                        "%-12s %-30s %-12s %-12s %-12s%n",
-                        prestamo.getCodigoMaterial(),
-                        ui.recortarTexto(
-                                prestamo.getTituloMaterial(),
-                                30
-                        ),
-                        formatearFecha(
-                                prestamo.getFechaInicio()
-                        ),
-                        formatearFecha(
-                                prestamo.getFechaVencimiento()
-                        ),
-                        prestamo.obtenerEstado()
-                );
-            }
-
-            System.out.println(
-                    "--------------------------------------------------------------------------------------"
-            );
-
-            ui.pausar();
-
-        } catch (SQLException e) {
-
-            ui.mostrarMensaje(
-                    "Error al consultar los prestamos activos: "
-                            + e.getMessage()
-            );
         }
     }
 
-    public void mostrarHistorialPrestamos(
-            Usuario usuario
+    private void mostrarFichaPrestamoActivo(
+            Usuario usuario,
+            PrestamoResumen prestamo
     ) {
+
+        while (true) {
+
+            ui.limpiarPantalla();
+
+            System.out.println("╔══════════════════════════════════════════════╗");
+            System.out.println("║              PRESTAMO ACTIVO                ║");
+            System.out.println("╠══════════════════════════════════════════════╣");
+
+            System.out.printf(
+                    "║ Material: %-32s║%n",
+                    ui.recortarTexto(
+                            prestamo.getTituloMaterial(),
+                            32
+                    )
+            );
+
+            System.out.printf(
+                    "║ Codigo:   %-32s║%n",
+                    prestamo.getCodigoMaterial()
+            );
+
+            System.out.printf(
+                    "║ Prestado: %-32s║%n",
+                    formatearFecha(
+                            prestamo.getFechaInicio()
+                    )
+            );
+
+            System.out.printf(
+                    "║ Vence:    %-32s║%n",
+                    formatearFecha(
+                            prestamo.getFechaVencimiento()
+                    )
+            );
+
+            System.out.printf(
+                    "║ Estado:   %-32s║%n",
+                    prestamo.obtenerEstado()
+            );
+
+            System.out.println("╠══════════════════════════════════════════════╣");
+            System.out.println("║  1. Registrar devolucion                    ║");
+            System.out.println("║  0. Volver                                  ║");
+            System.out.println("╚══════════════════════════════════════════════╝");
+
+            System.out.print("\nSeleccione una opcion: ");
+
+            int opcion = ui.leerEntero();
+
+            switch (opcion) {
+
+                case 1: {
+
+                    FlujoDevolucionUI flujoDevolucion =
+                            new FlujoDevolucionUI(
+                                    scanner
+                            );
+
+                    flujoDevolucion.registrarDevolucion(
+                            usuario,
+                            prestamo
+                    );
+
+                    return;
+                }
+
+                case 0:
+                    return;
+
+                default:
+                    ui.mostrarMensaje("Opcion invalida.");
+                    break;
+            }
+        }
+    }
+
+    public void mostrarHistorialPrestamos(Usuario usuario) {
 
         ui.limpiarPantalla();
 
-        System.out.println(
-                "╔══════════════════════════════════════════════════════════════════════════════╗"
-        );
-
-        System.out.println(
-                "║                        HISTORIAL DE PRESTAMOS                              ║"
-        );
-
-        System.out.println(
-                "╚══════════════════════════════════════════════════════════════════════════════╝"
-        );
+        System.out.println("╔══════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                        HISTORIAL DE PRESTAMOS                              ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
 
         System.out.println();
+        System.out.println("Usuario: " + usuario.getNombre() + " " + usuario.getApellido());
+        System.out.println("DNI: " + usuario.getDni());
 
-        System.out.println(
-                "Usuario: "
-                        + usuario.getNombre()
-                        + " "
-                        + usuario.getApellido()
-        );
-
-        System.out.println(
-                "DNI: "
-                        + usuario.getDni()
-        );
-
-        PrestamoDAO prestamoDAO =
-                new PrestamoDAO();
+        PrestamoDAO prestamoDAO = new PrestamoDAO();
 
         try {
 
@@ -177,19 +229,12 @@ public class ConsultaPrestamosUI {
                     );
 
             if (historial.isEmpty()) {
-
-                ui.mostrarMensaje(
-                        "El usuario no posee prestamos registrados."
-                );
-
+                ui.mostrarMensaje("El usuario no posee prestamos registrados.");
                 return;
             }
 
             System.out.println();
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------");
 
             System.out.printf(
                     "%-12s %-30s %-12s %-12s %-12s %-12s%n",
@@ -201,9 +246,7 @@ public class ConsultaPrestamosUI {
                     "Estado"
             );
 
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------");
 
             for (PrestamoResumen prestamo : historial) {
 
@@ -230,10 +273,7 @@ public class ConsultaPrestamosUI {
                 );
             }
 
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------"
-            );
-
+            System.out.println("----------------------------------------------------------------------------------------------------");
             ui.pausar();
 
         } catch (SQLException e) {
@@ -261,44 +301,21 @@ public class ConsultaPrestamosUI {
 
             ui.limpiarPantalla();
 
-            System.out.println(
-                    "╔══════════════════════════════════════════════════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║                               PRESTAMOS ACTIVOS                                         ║"
-            );
-
-            System.out.println(
-                    "╚══════════════════════════════════════════════════════════════════════════════════════════╝"
-            );
+            System.out.println("╔══════════════════════════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                               PRESTAMOS ACTIVOS                                         ║");
+            System.out.println("╚══════════════════════════════════════════════════════════════════════════════════════════╝");
 
             System.out.println();
-
-            System.out.println(
-                    "Material: "
-                            + material.getTitulo()
-            );
-
-            System.out.println(
-                    "Codigo:   "
-                            + material.getCodigo()
-            );
+            System.out.println("Material: " + material.getTitulo());
+            System.out.println("Codigo:   " + material.getCodigo());
 
             if (prestamos.isEmpty()) {
-
-                ui.mostrarMensaje(
-                        "Actualmente nadie tiene prestado este material."
-                );
-
+                ui.mostrarMensaje("Actualmente nadie tiene prestado este material.");
                 return;
             }
 
             System.out.println();
-
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("------------------------------------------------------------------------------------------------");
 
             System.out.printf(
                     "%-4s %-24s %-12s %-14s %-14s %-12s%n",
@@ -310,15 +327,9 @@ public class ConsultaPrestamosUI {
                     "Estado"
             );
 
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("------------------------------------------------------------------------------------------------");
 
-            for (
-                    int i = 0;
-                    i < prestamos.size();
-                    i++
-            ) {
+            for (int i = 0; i < prestamos.size(); i++) {
 
                 PrestamoMaterialResumen prestamo =
                         prestamos.get(i);
@@ -341,10 +352,7 @@ public class ConsultaPrestamosUI {
                 );
             }
 
-            System.out.println(
-                    "------------------------------------------------------------------------------------------------"
-            );
-
+            System.out.println("------------------------------------------------------------------------------------------------");
             ui.pausar();
 
         } catch (SQLException e) {
@@ -372,44 +380,21 @@ public class ConsultaPrestamosUI {
 
             ui.limpiarPantalla();
 
-            System.out.println(
-                    "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║                                      HISTORIAL DE PRESTAMOS                                             ║"
-            );
-
-            System.out.println(
-                    "╚══════════════════════════════════════════════════════════════════════════════════════════════════════════╝"
-            );
+            System.out.println("╔══════════════════════════════════════════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                                      HISTORIAL DE PRESTAMOS                                             ║");
+            System.out.println("╚══════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
 
             System.out.println();
-
-            System.out.println(
-                    "Material: "
-                            + material.getTitulo()
-            );
-
-            System.out.println(
-                    "Codigo:   "
-                            + material.getCodigo()
-            );
+            System.out.println("Material: " + material.getTitulo());
+            System.out.println("Codigo:   " + material.getCodigo());
 
             if (historial.isEmpty()) {
-
-                ui.mostrarMensaje(
-                        "Este material todavia no tiene prestamos registrados."
-                );
-
+                ui.mostrarMensaje("Este material todavia no tiene prestamos registrados.");
                 return;
             }
 
             System.out.println();
-
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------------");
 
             System.out.printf(
                     "%-4s %-22s %-12s %-12s %-12s %-12s %-12s%n",
@@ -422,15 +407,9 @@ public class ConsultaPrestamosUI {
                     "Estado"
             );
 
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
+            System.out.println("----------------------------------------------------------------------------------------------------------");
 
-            for (
-                    int i = 0;
-                    i < historial.size();
-                    i++
-            ) {
+            for (int i = 0; i < historial.size(); i++) {
 
                 PrestamoMaterialResumen prestamo =
                         historial.get(i);
@@ -456,10 +435,7 @@ public class ConsultaPrestamosUI {
                 );
             }
 
-            System.out.println(
-                    "----------------------------------------------------------------------------------------------------------"
-            );
-
+            System.out.println("----------------------------------------------------------------------------------------------------------");
             ui.pausar();
 
         } catch (SQLException e) {

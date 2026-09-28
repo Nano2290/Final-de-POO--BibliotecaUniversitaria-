@@ -19,7 +19,6 @@ public class FlujoDevolucionUI {
     private final ConsolaUI ui;
     private final SelectorUsuario selectorUsuario;
 
-
     public FlujoDevolucionUI(
             Scanner scanner
     ) {
@@ -38,36 +37,26 @@ public class FlujoDevolucionUI {
                 );
     }
 
-
     public void registrarDevolucion() {
 
         Usuario usuario =
                 selectorUsuario.seleccionar();
 
-
-        if (
-                usuario == null
-        ) {
-
+        if (usuario == null) {
             return;
         }
-
 
         PrestamoDAO prestamoDAO =
                 new PrestamoDAO();
 
-
         List<PrestamoResumen> prestamosActivos;
-
 
         try {
 
             prestamosActivos =
-                    prestamoDAO
-                            .listarPrestamosActivosPorUsuario(
-                                    usuario.getId()
-                            );
-
+                    prestamoDAO.listarPrestamosActivosPorUsuario(
+                            usuario.getId()
+                    );
 
         } catch (SQLException e) {
 
@@ -79,10 +68,7 @@ public class FlujoDevolucionUI {
             return;
         }
 
-
-        if (
-                prestamosActivos.isEmpty()
-        ) {
+        if (prestamosActivos.isEmpty()) {
 
             ui.mostrarMensaje(
                     "El usuario no tiene prestamos activos para devolver."
@@ -91,46 +77,20 @@ public class FlujoDevolucionUI {
             return;
         }
 
-
-        while (
-                true
-        ) {
+        while (true) {
 
             ui.limpiarPantalla();
 
-
-            System.out.println(
-                    "╔════════════════════════════════════════════════════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║                                   REGISTRAR DEVOLUCION                                    ║"
-            );
-
-            System.out.println(
-                    "╚════════════════════════════════════════════════════════════════════════════════════════════╝"
-            );
-
+            System.out.println("╔════════════════════════════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                                   REGISTRAR DEVOLUCION                                    ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════════════════════════════════╝");
 
             System.out.println();
-
-            System.out.println(
-                    "Usuario: "
-                            + usuario.getNombre()
-                            + " "
-                            + usuario.getApellido()
-            );
-
-            System.out.println(
-                    "DNI: "
-                            + usuario.getDni()
-            );
+            System.out.println("Usuario: " + usuario.getNombre() + " " + usuario.getApellido());
+            System.out.println("DNI: " + usuario.getDni());
 
             System.out.println();
-
-            System.out.println(
-                    "--------------------------------------------------------------------------------------------"
-            );
+            System.out.println("--------------------------------------------------------------------------------------------");
 
             System.out.printf(
                     "%-4s %-12s %-32s %-14s %-14s %-12s%n",
@@ -142,22 +102,12 @@ public class FlujoDevolucionUI {
                     "Estado"
             );
 
-            System.out.println(
-                    "--------------------------------------------------------------------------------------------"
-            );
+            System.out.println("--------------------------------------------------------------------------------------------");
 
-
-            for (
-                    int i = 0;
-                    i < prestamosActivos.size();
-                    i++
-            ) {
+            for (int i = 0; i < prestamosActivos.size(); i++) {
 
                 PrestamoResumen prestamo =
-                        prestamosActivos.get(
-                                i
-                        );
-
+                        prestamosActivos.get(i);
 
                 System.out.printf(
                         "%-4d %-12s %-32s %-14s %-14s %-12s%n",
@@ -177,33 +127,18 @@ public class FlujoDevolucionUI {
                 );
             }
 
-
-            System.out.println(
-                    "--------------------------------------------------------------------------------------------"
-            );
-
+            System.out.println("--------------------------------------------------------------------------------------------");
             System.out.println();
+            System.out.println("0. Volver");
 
-            System.out.println(
-                    "0. Volver"
-            );
-
-            System.out.print(
-                    "\nSeleccione el prestamo a devolver: "
-            );
-
+            System.out.print("\nSeleccione el prestamo a devolver: ");
 
             int opcion =
                     ui.leerEntero();
 
-
-            if (
-                    opcion == 0
-            ) {
-
+            if (opcion == 0) {
                 return;
             }
-
 
             if (
                     opcion < 1
@@ -217,117 +152,195 @@ public class FlujoDevolucionUI {
                 continue;
             }
 
-
             PrestamoResumen prestamoSeleccionado =
                     prestamosActivos.get(
                             opcion - 1
                     );
 
+            registrarDevolucion(
+                    usuario,
+                    prestamoSeleccionado
+            );
 
-            LocalDate fechaDevolucion =
-                    LocalDate.now();
+            return;
+        }
+    }
 
+    public void registrarDevolucion(
+            Usuario usuario,
+            PrestamoResumen prestamoSeleccionado
+    ) {
 
-            while (
-                    true
+        PrestamoDAO prestamoDAO =
+                new PrestamoDAO();
+
+        LocalDate fechaDevolucion =
+                LocalDate.now();
+
+        while (true) {
+
+            long diasAtraso =
+                    0;
+
+            if (
+                    fechaDevolucion.isAfter(
+                            prestamoSeleccionado.getFechaVencimiento()
+                    )
             ) {
 
-                long diasAtraso =
-                        0;
+                diasAtraso =
+                        java.time.temporal.ChronoUnit.DAYS
+                                .between(
+                                        prestamoSeleccionado.getFechaVencimiento(),
+                                        fechaDevolucion
+                                );
+            }
 
+            double multaEstimada =
+                    diasAtraso > 0
+                            ? usuario.calcularMulta(
+                                    (int) diasAtraso
+                            )
+                            : 0.0;
 
-                if (
-                        fechaDevolucion.isAfter(
-                                prestamoSeleccionado
-                                        .getFechaVencimiento()
-                        )
-                ) {
+            ui.limpiarPantalla();
 
-                    diasAtraso =
-                            java.time.temporal.ChronoUnit.DAYS
-                                    .between(
-                                            prestamoSeleccionado
-                                                    .getFechaVencimiento(),
-                                            fechaDevolucion
-                                    );
-                }
+            System.out.println("╔══════════════════════════════════════════════╗");
+            System.out.println("║            CONFIRMAR DEVOLUCION             ║");
+            System.out.println("╠══════════════════════════════════════════════╣");
 
+            System.out.printf(
+                    "║ Usuario: %-33s║%n",
+                    ui.recortarTexto(
+                            usuario.getNombre()
+                                    + " "
+                                    + usuario.getApellido(),
+                            33
+                    )
+            );
 
-                double multaEstimada =
-                        diasAtraso > 0
-                                ? usuario.calcularMulta(
-                                        (int) diasAtraso
-                                )
-                                : 0.0;
+            System.out.printf(
+                    "║ Material: %-32s║%n",
+                    ui.recortarTexto(
+                            prestamoSeleccionado.getTituloMaterial(),
+                            32
+                    )
+            );
 
+            System.out.printf(
+                    "║ Codigo:   %-32s║%n",
+                    prestamoSeleccionado.getCodigoMaterial()
+            );
 
-                ui.limpiarPantalla();
+            System.out.printf(
+                    "║ Inicio:   %-32s║%n",
+                    formatearFecha(
+                            prestamoSeleccionado.getFechaInicio()
+                    )
+            );
 
+            System.out.printf(
+                    "║ Vence:    %-32s║%n",
+                    formatearFecha(
+                            prestamoSeleccionado.getFechaVencimiento()
+                    )
+            );
 
-                System.out.println(
-                        "╔══════════════════════════════════════════════╗"
-                );
+            System.out.printf(
+                    "║ Devuelve: %-32s║%n",
+                    formatearFecha(
+                            fechaDevolucion
+                    )
+            );
 
-                System.out.println(
-                        "║            CONFIRMAR DEVOLUCION             ║"
-                );
+            if (diasAtraso > 0) {
 
-                System.out.println(
-                        "╠══════════════════════════════════════════════╣"
+                System.out.printf(
+                        "║ Atraso:   %-24s dias║%n",
+                        diasAtraso
                 );
 
                 System.out.printf(
-                        "║ Usuario: %-33s║%n",
-                        ui.recortarTexto(
-                                usuario.getNombre()
-                                        + " "
-                                        + usuario.getApellido(),
-                                33
-                        )
+                        "║ Multa:    $%-31.2f║%n",
+                        multaEstimada
                 );
+
+            } else {
+
+                System.out.printf(
+                        "║ Atraso:   %-32s║%n",
+                        "SIN ATRASO"
+                );
+            }
+
+            System.out.println("╠══════════════════════════════════════════════╣");
+            System.out.println("║  1. Confirmar devolucion                    ║");
+            System.out.println("║  2. Cambiar fecha de devolucion             ║");
+            System.out.println("║  0. Cancelar                                ║");
+            System.out.println("╚══════════════════════════════════════════════╝");
+
+            System.out.print("\nSeleccione una opcion: ");
+
+            int confirmacion =
+                    ui.leerEntero();
+
+            if (confirmacion == 0) {
+                return;
+            }
+
+            if (confirmacion == 2) {
+
+                LocalDate nuevaFecha =
+                        leerFechaDevolucion(
+                                prestamoSeleccionado.getFechaInicio()
+                        );
+
+                if (nuevaFecha != null) {
+                    fechaDevolucion =
+                            nuevaFecha;
+                }
+
+                continue;
+            }
+
+            if (confirmacion != 1) {
+
+                ui.mostrarMensaje(
+                        "Opcion invalida."
+                );
+
+                continue;
+            }
+
+            try {
+
+                prestamoDAO.registrarDevolucion(
+                        prestamoSeleccionado.getIdPrestamo(),
+                        fechaDevolucion
+                );
+
+                ui.limpiarPantalla();
+
+                System.out.println("╔══════════════════════════════════════════════╗");
+                System.out.println("║          DEVOLUCION REGISTRADA              ║");
+                System.out.println("╠══════════════════════════════════════════════╣");
 
                 System.out.printf(
                         "║ Material: %-32s║%n",
                         ui.recortarTexto(
-                                prestamoSeleccionado
-                                        .getTituloMaterial(),
+                                prestamoSeleccionado.getTituloMaterial(),
                                 32
                         )
                 );
 
                 System.out.printf(
-                        "║ Codigo:   %-32s║%n",
-                        prestamoSeleccionado
-                                .getCodigoMaterial()
-                );
-
-                System.out.printf(
-                        "║ Inicio:   %-32s║%n",
-                        formatearFecha(
-                                prestamoSeleccionado
-                                        .getFechaInicio()
-                        )
-                );
-
-                System.out.printf(
-                        "║ Vence:    %-32s║%n",
-                        formatearFecha(
-                                prestamoSeleccionado
-                                        .getFechaVencimiento()
-                        )
-                );
-
-                System.out.printf(
-                        "║ Devuelve: %-32s║%n",
+                        "║ Fecha:    %-32s║%n",
                         formatearFecha(
                                 fechaDevolucion
                         )
                 );
 
-
-                if (
-                        diasAtraso > 0
-                ) {
+                if (diasAtraso > 0) {
 
                     System.out.printf(
                             "║ Atraso:   %-24s dias║%n",
@@ -335,174 +348,32 @@ public class FlujoDevolucionUI {
                     );
 
                     System.out.printf(
-                            "║ Multa:    $%-31.2f║%n",
+                            "║ Multa generada: $%-23.2f║%n",
                             multaEstimada
                     );
 
                 } else {
 
                     System.out.printf(
-                            "║ Atraso:   %-32s║%n",
-                            "SIN ATRASO"
+                            "║ Multa:    %-32s║%n",
+                            "NO CORRESPONDE"
                     );
                 }
 
+                System.out.println("╚══════════════════════════════════════════════╝");
 
-                System.out.println(
-                        "╠══════════════════════════════════════════════╣"
+                ui.pausar();
+
+                return;
+
+            } catch (SQLException e) {
+
+                ui.mostrarMensaje(
+                        "No se pudo registrar la devolucion: "
+                                + e.getMessage()
                 );
 
-                System.out.println(
-                        "║  1. Confirmar devolucion                    ║"
-                );
-
-                System.out.println(
-                        "║  2. Cambiar fecha de devolucion             ║"
-                );
-
-                System.out.println(
-                        "║  0. Cancelar                                ║"
-                );
-
-                System.out.println(
-                        "╚══════════════════════════════════════════════╝"
-                );
-
-                System.out.print(
-                        "\nSeleccione una opcion: "
-                );
-
-
-                int confirmacion =
-                        ui.leerEntero();
-
-
-                if (
-                        confirmacion == 0
-                ) {
-
-                    return;
-                }
-
-
-                if (
-                        confirmacion == 2
-                ) {
-
-                    LocalDate nuevaFecha =
-                            leerFechaDevolucion(
-                                    prestamoSeleccionado
-                                            .getFechaInicio()
-                            );
-
-
-                    if (
-                            nuevaFecha != null
-                    ) {
-
-                        fechaDevolucion =
-                                nuevaFecha;
-                    }
-
-
-                    continue;
-                }
-
-
-                if (
-                        confirmacion != 1
-                ) {
-
-                    ui.mostrarMensaje(
-                            "Opcion invalida."
-                    );
-
-                    continue;
-                }
-
-
-                try {
-
-                    prestamoDAO.registrarDevolucion(
-                            prestamoSeleccionado
-                                    .getIdPrestamo(),
-                            fechaDevolucion
-                    );
-
-
-                    ui.limpiarPantalla();
-
-
-                    System.out.println(
-                            "╔══════════════════════════════════════════════╗"
-                    );
-
-                    System.out.println(
-                            "║          DEVOLUCION REGISTRADA              ║"
-                    );
-
-                    System.out.println(
-                            "╠══════════════════════════════════════════════╣"
-                    );
-
-                    System.out.printf(
-                            "║ Material: %-32s║%n",
-                            ui.recortarTexto(
-                                    prestamoSeleccionado
-                                            .getTituloMaterial(),
-                                    32
-                            )
-                    );
-
-                    System.out.printf(
-                            "║ Fecha:    %-32s║%n",
-                            formatearFecha(
-                                    fechaDevolucion
-                            )
-                    );
-
-
-                    if (
-                            diasAtraso > 0
-                    ) {
-
-                        System.out.printf(
-                                "║ Atraso:   %-24s dias║%n",
-                                diasAtraso
-                        );
-
-                        System.out.printf(
-                                "║ Multa generada: $%-23.2f║%n",
-                                multaEstimada
-                        );
-
-                    } else {
-
-                        System.out.printf(
-                                "║ Multa:    %-32s║%n",
-                                "NO CORRESPONDE"
-                        );
-                    }
-
-
-                    System.out.println(
-                            "╚══════════════════════════════════════════════╝"
-                    );
-
-                    ui.pausar();
-
-                    return;
-
-
-                } catch (SQLException e) {
-
-                    ui.mostrarMensaje(
-                            "No se pudo registrar la devolucion: "
-                                    + e.getMessage()
-                    );
-
-                    return;
-                }
+                return;
             }
         }
     }
@@ -516,28 +387,15 @@ public class FlujoDevolucionUI {
                         "dd/MM/yyyy"
                 );
 
-
-        while (
-                true
-        ) {
+        while (true) {
 
             ui.limpiarPantalla();
 
-
-            System.out.println(
-                    "╔══════════════════════════════════════════════╗"
-            );
-
-            System.out.println(
-                    "║       CAMBIAR FECHA DE DEVOLUCION           ║"
-            );
-
-            System.out.println(
-                    "╚══════════════════════════════════════════════╝"
-            );
+            System.out.println("╔══════════════════════════════════════════════╗");
+            System.out.println("║       CAMBIAR FECHA DE DEVOLUCION           ║");
+            System.out.println("╚══════════════════════════════════════════════╝");
 
             System.out.println();
-
             System.out.println(
                     "Fecha de inicio del prestamo: "
                             + formatearFecha(
@@ -553,7 +411,6 @@ public class FlujoDevolucionUI {
             );
 
             System.out.println();
-
             System.out.println(
                     "Ingrese la fecha en formato dd/MM/yyyy."
             );
@@ -566,21 +423,13 @@ public class FlujoDevolucionUI {
                     "\nNueva fecha: "
             );
 
-
             String texto =
                     scanner.nextLine()
                             .trim();
 
-
-            if (
-                    texto.equals(
-                            "0"
-                    )
-            ) {
-
+            if (texto.equals("0")) {
                 return null;
             }
-
 
             try {
 
@@ -590,12 +439,7 @@ public class FlujoDevolucionUI {
                                 formato
                         );
 
-
-                if (
-                        fecha.isBefore(
-                                fechaInicio
-                        )
-                ) {
+                if (fecha.isBefore(fechaInicio)) {
 
                     ui.mostrarMensaje(
                             "La fecha de devolucion no puede ser anterior "
@@ -605,12 +449,7 @@ public class FlujoDevolucionUI {
                     continue;
                 }
 
-
-                if (
-                        fecha.isAfter(
-                                LocalDate.now()
-                        )
-                ) {
+                if (fecha.isAfter(LocalDate.now())) {
 
                     ui.mostrarMensaje(
                             "La fecha de devolucion no puede ser futura."
@@ -619,9 +458,7 @@ public class FlujoDevolucionUI {
                     continue;
                 }
 
-
                 return fecha;
-
 
             } catch (DateTimeParseException e) {
 
@@ -631,7 +468,6 @@ public class FlujoDevolucionUI {
             }
         }
     }
-
 
     private String formatearFecha(
             LocalDate fecha

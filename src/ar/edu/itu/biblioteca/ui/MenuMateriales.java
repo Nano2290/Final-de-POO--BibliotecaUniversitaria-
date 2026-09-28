@@ -650,7 +650,7 @@ public class MenuMateriales {
     }
 
 
-    private void buscarMaterial() {
+    public void buscarMaterial() {
 
         ui.limpiarPantalla();
 

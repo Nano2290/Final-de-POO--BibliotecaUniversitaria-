@@ -245,7 +245,7 @@ public class MenuUsuarios {
         }
     }
 
-    private void buscarUsuario() {
+    public void buscarUsuario() {
 
         ui.limpiarPantalla();
 
