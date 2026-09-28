@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import ar.edu.itu.biblioteca.model.PrestamoResumen;
 import ar.edu.itu.biblioteca.model.PrestamoMaterialResumen;
+import ar.edu.itu.biblioteca.model.PrestamoVencidoResumen;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -299,82 +300,10 @@ public class PrestamoDAO {
                                     "usuario_id"
                             );
 
-                    String dni =
-                             resultado.getString(
-                                     "dni"
+                    usuario =
+                            crearUsuarioDesdeResultado(
+                                    resultado
                             );
-
-                   String email =
-                            resultado.getString(
-                                    "email"
-                            );
-
-                    String nombre =
-                            resultado.getString(
-                                    "nombre"
-                            );
-
-                    String apellido =
-                            resultado.getString(
-                                    "apellido"
-                            );
-
-                    String tipoUsuario =
-                            resultado.getString(
-                                    "tipo_usuario"
-                            );
-
-                    boolean activo =
-                            resultado.getBoolean(
-                                    "activo"
-                            );
-
-                    /*
-                     * Reconstruimos el tipo concreto de usuario
-                     * para aprovechar el polimorfismo.
-                     */
-
-                    if (
-                            "ESTUDIANTE"
-                                    .equalsIgnoreCase(
-                                            tipoUsuario
-                                    )
-                    ) {
-
-                        usuario = new Estudiante(
-                                            usuarioId,
-                                                  dni,
-                                               nombre,
-                                             apellido,
-                                               email
-                                     );
-
-                    } else if (
-                            "DOCENTE"
-                                    .equalsIgnoreCase(
-                                            tipoUsuario
-                                    )
-                    ) {
-
-                       usuario = new Docente(
-                                             usuarioId,
-                                                   dni,
-                                                 nombre,
-                                               apellido,
-                                                   email
-                                            );
-
-                    } else {
-
-                        throw new SQLException(
-                                "Tipo de usuario desconocido: "
-                                        + tipoUsuario
-                        );
-                    }
-
-                    usuario.setActivo(
-                            activo
-                    );
                 }
             }
 
@@ -947,6 +876,201 @@ listarHistorialPorMaterial(
 
     return historial;
 }
+
+
+    public List<PrestamoVencidoResumen> listarPrestamosVencidos(
+            LocalDate fechaReferencia
+    ) throws SQLException {
+
+        if (fechaReferencia == null) {
+
+            throw new IllegalArgumentException(
+                    "La fecha de referencia no puede ser nula."
+            );
+        }
+
+        List<PrestamoVencidoResumen> prestamosVencidos =
+                new ArrayList<>();
+
+        String sql = """
+                SELECT
+                    p.id AS prestamo_id,
+                    p.fecha_inicio,
+                    p.fecha_vencimiento,
+                    u.id AS usuario_id,
+                    u.dni,
+                    u.nombre,
+                    u.apellido,
+                    u.email,
+                    u.tipo_usuario,
+                    u.activo,
+                    m.codigo AS codigo_material,
+                    m.titulo AS titulo_material
+                FROM prestamos p
+                INNER JOIN usuarios u
+                    ON p.usuario_id = u.id
+                INNER JOIN materiales m
+                    ON p.material_id = m.id
+                WHERE p.fecha_devolucion IS NULL
+                AND p.fecha_vencimiento < ?
+                ORDER BY
+                    p.fecha_vencimiento ASC,
+                    p.id ASC
+                """;
+
+        try (
+                Connection conexion =
+                        ConexionBD.obtenerConexion();
+
+                PreparedStatement statement =
+                        conexion.prepareStatement(
+                                sql
+                        )
+        ) {
+
+            statement.setDate(
+                    1,
+                    Date.valueOf(
+                            fechaReferencia
+                    )
+            );
+
+            try (
+                    ResultSet resultado =
+                            statement.executeQuery()
+            ) {
+
+                while (resultado.next()) {
+
+                    Usuario usuario =
+                            crearUsuarioDesdeResultado(
+                                    resultado
+                            );
+
+                    PrestamoVencidoResumen resumen =
+                            new PrestamoVencidoResumen(
+                                    resultado.getInt(
+                                            "prestamo_id"
+                                    ),
+                                    usuario,
+                                    resultado.getString(
+                                            "codigo_material"
+                                    ),
+                                    resultado.getString(
+                                            "titulo_material"
+                                    ),
+                                    resultado.getDate(
+                                            "fecha_inicio"
+                                    ).toLocalDate(),
+                                    resultado.getDate(
+                                            "fecha_vencimiento"
+                                    ).toLocalDate()
+                            );
+
+                    prestamosVencidos.add(
+                            resumen
+                    );
+                }
+            }
+        }
+
+        return prestamosVencidos;
+    }
+
+
+    /*
+     * Centraliza la reconstruccion polimorfica del Usuario.
+     * La reutilizan las consultas de prestamos para evitar
+     * repetir la creacion de Estudiante/Docente.
+     */
+    private Usuario crearUsuarioDesdeResultado(
+            ResultSet resultado
+    ) throws SQLException {
+
+        int usuarioId =
+                resultado.getInt(
+                        "usuario_id"
+                );
+
+        String dni =
+                resultado.getString(
+                        "dni"
+                );
+
+        String nombre =
+                resultado.getString(
+                        "nombre"
+                );
+
+        String apellido =
+                resultado.getString(
+                        "apellido"
+                );
+
+        String email =
+                resultado.getString(
+                        "email"
+                );
+
+        String tipoUsuario =
+                resultado.getString(
+                        "tipo_usuario"
+                );
+
+        boolean activo =
+                resultado.getBoolean(
+                        "activo"
+                );
+
+        Usuario usuario;
+
+        if (
+                "ESTUDIANTE"
+                        .equalsIgnoreCase(
+                                tipoUsuario
+                        )
+        ) {
+
+            usuario =
+                    new Estudiante(
+                            usuarioId,
+                            dni,
+                            nombre,
+                            apellido,
+                            email
+                    );
+
+        } else if (
+                "DOCENTE"
+                        .equalsIgnoreCase(
+                                tipoUsuario
+                        )
+        ) {
+
+            usuario =
+                    new Docente(
+                            usuarioId,
+                            dni,
+                            nombre,
+                            apellido,
+                            email
+                    );
+
+        } else {
+
+            throw new SQLException(
+                    "Tipo de usuario desconocido: "
+                            + tipoUsuario
+            );
+        }
+
+        usuario.setActivo(
+                activo
+        );
+
+        return usuario;
+    }
+
 
     private void cerrarConexion(
             Connection conexion
