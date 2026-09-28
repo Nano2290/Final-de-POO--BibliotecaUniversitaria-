@@ -133,13 +133,17 @@ public class MenuPrincipal {
                 break;
             }
 
-            case 4:
+            case 4: {
 
-                ui.mostrarMensaje(
-                        "La gestion global de multas se completara en el siguiente bloque."
-                );
+    MenuMultas menuMultas =
+            new MenuMultas(
+                    scanner
+            );
 
-                break;
+    menuMultas.iniciar();
+
+    break;
+}
 
             case 0:
 

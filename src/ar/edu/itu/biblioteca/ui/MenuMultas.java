@@ -1,6 +1,7 @@
 package ar.edu.itu.biblioteca.ui;
 
 import ar.edu.itu.biblioteca.dao.MultaDAO;
+import ar.edu.itu.biblioteca.dao.UsuarioDAO;
 import ar.edu.itu.biblioteca.model.MultaResumen;
 import ar.edu.itu.biblioteca.model.Usuario;
 
@@ -12,17 +13,251 @@ import java.util.Scanner;
 
 public class MenuMultas {
 
+    private final Scanner scanner;
     private final ConsolaUI ui;
+
 
     public MenuMultas(
             Scanner scanner
     ) {
+
+        this.scanner =
+                scanner;
 
         this.ui =
                 new ConsolaUI(
                         scanner
                 );
     }
+
+
+    public void iniciar() {
+
+        while (
+                true
+        ) {
+
+            ui.limpiarPantalla();
+
+            System.out.println(
+                    "╔══════════════════════════════════════════════╗"
+            );
+
+            System.out.println(
+                    "║          GESTION GLOBAL DE MULTAS           ║"
+            );
+
+            System.out.println(
+                    "╠══════════════════════════════════════════════╣"
+            );
+
+            System.out.println(
+                    "║ Buscar usuario por DNI, nombre o apellido.  ║"
+            );
+
+            System.out.println(
+                    "║                                              ║"
+            );
+
+            System.out.println(
+                    "║  0. Volver                                  ║"
+            );
+
+            System.out.println(
+                    "╚══════════════════════════════════════════════╝"
+            );
+
+            System.out.print(
+                    "\nBuscar usuario: "
+            );
+
+            String texto =
+                    scanner.nextLine()
+                            .trim();
+
+            if (
+                    texto.equals(
+                            "0"
+                    )
+            ) {
+
+                return;
+            }
+
+            if (
+                    texto.isEmpty()
+            ) {
+
+                ui.mostrarMensaje(
+                        "Debe ingresar un criterio de busqueda."
+                );
+
+                continue;
+            }
+
+            Usuario usuario =
+                    seleccionarUsuario(
+                            texto
+                    );
+
+            if (
+                    usuario != null
+            ) {
+
+                mostrarMultasDeUsuario(
+                        usuario
+                );
+            }
+        }
+    }
+
+
+    private Usuario seleccionarUsuario(
+            String texto
+    ) {
+
+        UsuarioDAO usuarioDAO =
+                new UsuarioDAO();
+
+        try {
+
+            List<Usuario> usuarios =
+                    usuarioDAO.buscarCoincidencias(
+                            texto
+                    );
+
+            if (
+                    usuarios.isEmpty()
+            ) {
+
+                ui.mostrarMensaje(
+                        "No se encontraron usuarios."
+                );
+
+                return null;
+            }
+
+            if (
+                    usuarios.size() == 1
+            ) {
+
+                return usuarios.get(
+                        0
+                );
+            }
+
+            while (
+                    true
+            ) {
+
+                ui.limpiarPantalla();
+
+                System.out.println(
+                        "╔════════════════════════════════════════════════════════════════════╗"
+                );
+
+                System.out.println(
+                        "║                    USUARIOS ENCONTRADOS                          ║"
+                );
+
+                System.out.println(
+                        "╚════════════════════════════════════════════════════════════════════╝"
+                );
+
+                System.out.println();
+
+                System.out.printf(
+                        "%-4s %-12s %-24s %-12s%n",
+                        "Nro",
+                        "DNI",
+                        "Usuario",
+                        "Estado"
+                );
+
+                System.out.println(
+                        "--------------------------------------------------------------------"
+                );
+
+                for (
+                        int i = 0;
+                        i < usuarios.size();
+                        i++
+                ) {
+
+                    Usuario usuario =
+                            usuarios.get(
+                                    i
+                            );
+
+                    System.out.printf(
+                            "%-4d %-12s %-24s %-12s%n",
+                            i + 1,
+                            usuario.getDni(),
+                            ui.recortarTexto(
+                                    usuario.getNombre()
+                                            + " "
+                                            + usuario.getApellido(),
+                                    24
+                            ),
+                            usuario.isActivo()
+                                    ? "ACTIVO"
+                                    : "SUSPENDIDO"
+                    );
+                }
+
+                System.out.println(
+                        "--------------------------------------------------------------------"
+                );
+
+                System.out.println();
+                System.out.println(
+                        "0. Volver"
+                );
+
+                System.out.print(
+                        "\nSeleccione un usuario: "
+                );
+
+                int opcion =
+                        ui.leerEntero();
+
+                if (
+                        opcion == 0
+                ) {
+
+                    return null;
+                }
+
+                if (
+                        opcion < 1
+                                || opcion > usuarios.size()
+                ) {
+
+                    ui.mostrarMensaje(
+                            "Seleccion invalida."
+                    );
+
+                    continue;
+                }
+
+                return usuarios.get(
+                        opcion - 1
+                );
+            }
+
+        } catch (
+                SQLException e
+        ) {
+
+            ui.mostrarMensaje(
+                    "Error al buscar usuarios: "
+                            + e.getMessage()
+            );
+
+            return null;
+        }
+    }
+
 
     public void mostrarMultasDeUsuario(
             Usuario usuario
@@ -143,7 +378,9 @@ public class MenuMultas {
                     break;
             }
 
-        } while (opcion != 0);
+        } while (
+                opcion != 0
+        );
     }
 
 
@@ -167,7 +404,9 @@ public class MenuMultas {
                     "TODAS LAS MULTAS"
             );
 
-        } catch (SQLException e) {
+        } catch (
+                SQLException e
+        ) {
 
             ui.mostrarMensaje(
                     "Error al consultar las multas: "
@@ -204,7 +443,9 @@ public class MenuMultas {
                     titulo
             );
 
-        } catch (SQLException e) {
+        } catch (
+                SQLException e
+        ) {
 
             ui.mostrarMensaje(
                     "Error al consultar las multas: "
@@ -249,7 +490,9 @@ public class MenuMultas {
                         + usuario.getDni()
         );
 
-        if (multas.isEmpty()) {
+        if (
+                multas.isEmpty()
+        ) {
 
             ui.mostrarMensaje(
                     "No hay multas para mostrar."
@@ -282,12 +525,20 @@ public class MenuMultas {
         double totalPendiente =
                 0.0;
 
-        for (int i = 0; i < multas.size(); i++) {
+        for (
+                int i = 0;
+                i < multas.size();
+                i++
+        ) {
 
             MultaResumen multa =
-                    multas.get(i);
+                    multas.get(
+                            i
+                    );
 
-            if (!multa.isPagada()) {
+            if (
+                    !multa.isPagada()
+            ) {
 
                 totalPendiente +=
                         multa.getMonto();
@@ -338,7 +589,9 @@ public class MenuMultas {
                             false
                     );
 
-            if (pendientes.isEmpty()) {
+            if (
+                    pendientes.isEmpty()
+            ) {
 
                 ui.mostrarMensaje(
                         "El usuario no posee multas pendientes."
@@ -394,10 +647,16 @@ public class MenuMultas {
                     "--------------------------------------------------------------------------------------------"
             );
 
-            for (int i = 0; i < pendientes.size(); i++) {
+            for (
+                    int i = 0;
+                    i < pendientes.size();
+                    i++
+            ) {
 
                 MultaResumen multa =
-                        pendientes.get(i);
+                        pendientes.get(
+                                i
+                        );
 
                 System.out.printf(
                         "%-4d %-12s %-28s %-12d $%-11.2f%n",
@@ -428,13 +687,16 @@ public class MenuMultas {
             int seleccion =
                     ui.leerEntero();
 
-            if (seleccion == 0) {
+            if (
+                    seleccion == 0
+            ) {
+
                 return;
             }
 
             if (
                     seleccion < 1
-                    || seleccion > pendientes.size()
+                            || seleccion > pendientes.size()
             ) {
 
                 ui.mostrarMensaje(
@@ -504,11 +766,16 @@ public class MenuMultas {
             int confirmacion =
                     ui.leerEntero();
 
-            if (confirmacion == 0) {
+            if (
+                    confirmacion == 0
+            ) {
+
                 return;
             }
 
-            if (confirmacion != 1) {
+            if (
+                    confirmacion != 1
+            ) {
 
                 ui.mostrarMensaje(
                         "Opcion invalida."
@@ -522,7 +789,9 @@ public class MenuMultas {
                             multaSeleccionada.getIdMulta()
                     );
 
-            if (actualizado) {
+            if (
+                    actualizado
+            ) {
 
                 ui.mostrarMensaje(
                         "Pago registrado correctamente."
@@ -535,7 +804,9 @@ public class MenuMultas {
                 );
             }
 
-        } catch (SQLException e) {
+        } catch (
+                SQLException e
+        ) {
 
             ui.mostrarMensaje(
                     "Error al registrar el pago: "
@@ -549,7 +820,10 @@ public class MenuMultas {
             LocalDate fecha
     ) {
 
-        if (fecha == null) {
+        if (
+                fecha == null
+        ) {
+
             return "-";
         }
 
