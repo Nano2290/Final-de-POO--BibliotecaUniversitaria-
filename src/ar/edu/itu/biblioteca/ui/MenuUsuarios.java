@@ -1,6 +1,7 @@
 package ar.edu.itu.biblioteca.ui;
 
 import ar.edu.itu.biblioteca.dao.MultaDAO;
+import ar.edu.itu.biblioteca.dao.PrestamoDAO;
 import ar.edu.itu.biblioteca.dao.UsuarioDAO;
 import ar.edu.itu.biblioteca.model.Docente;
 import ar.edu.itu.biblioteca.model.Estudiante;
@@ -16,26 +17,15 @@ public class MenuUsuarios {
     private final Scanner scanner;
     private final ConsolaUI ui;
 
-    public MenuUsuarios(
-            Scanner scanner
-    ) {
-
-        this.scanner =
-                scanner;
-
-        this.ui =
-                new ConsolaUI(
-                        scanner
-                );
+    public MenuUsuarios(Scanner scanner) {
+        this.scanner = scanner;
+        this.ui = new ConsolaUI(scanner);
     }
 
-
     public void iniciar() {
-
         int opcion;
 
         do {
-
             ui.limpiarPantalla();
             mostrarMenu();
 
@@ -43,39 +33,29 @@ public class MenuUsuarios {
             opcion = ui.leerEntero();
 
             switch (opcion) {
-
                 case 1:
                     registrarUsuario();
                     break;
-
                 case 2:
                     buscarUsuario();
                     break;
-
                 case 3:
                     listarUsuarios();
                     break;
-
                 case 4:
                     filtrarPorEstado();
                     break;
-
                 case 0:
                     break;
-
                 default:
-                    ui.mostrarMensaje(
-                            "Opcion invalida."
-                    );
+                    ui.mostrarMensaje("Opcion invalida.");
                     break;
             }
 
         } while (opcion != 0);
     }
 
-
     private void mostrarMenu() {
-
         System.out.println("╔══════════════════════════════════════════════╗");
         System.out.println("║             GESTION DE USUARIOS             ║");
         System.out.println("╠══════════════════════════════════════════════╣");
@@ -88,7 +68,6 @@ public class MenuUsuarios {
         System.out.println("╚══════════════════════════════════════════════╝");
     }
 
-
     private void registrarUsuario() {
 
         while (true) {
@@ -100,77 +79,53 @@ public class MenuUsuarios {
             System.out.println("╚══════════════════════════════════════════════╝");
 
             System.out.println();
-            System.out.println(
-                    "Escriba 0 en cualquier momento para cancelar."
-            );
+            System.out.println("Escriba 0 en cualquier momento para cancelar.");
             System.out.println();
 
             System.out.print("DNI: ");
-
-            String dni =
-                    scanner.nextLine().trim();
+            String dni = scanner.nextLine().trim();
 
             if (dni.equals("0")) {
                 return;
             }
 
             if (!dni.matches("\\d{7,8}")) {
-
                 ui.mostrarMensaje(
                         "El DNI debe contener solamente 7 u 8 numeros."
                 );
-
                 continue;
             }
 
-
             System.out.print("Nombre: ");
-
-            String nombre =
-                    scanner.nextLine().trim();
+            String nombre = scanner.nextLine().trim();
 
             if (nombre.equals("0")) {
                 return;
             }
 
             if (nombre.isEmpty()) {
-
-                ui.mostrarMensaje(
-                        "El nombre es obligatorio."
-                );
-
+                ui.mostrarMensaje("El nombre es obligatorio.");
                 continue;
             }
 
-
             System.out.print("Apellido: ");
-
-            String apellido =
-                    scanner.nextLine().trim();
+            String apellido = scanner.nextLine().trim();
 
             if (apellido.equals("0")) {
                 return;
             }
 
             if (apellido.isEmpty()) {
-
-                ui.mostrarMensaje(
-                        "El apellido es obligatorio."
-                );
-
+                ui.mostrarMensaje("El apellido es obligatorio.");
                 continue;
             }
 
-
             System.out.print("Email: ");
-
-            String email =
-                    scanner.nextLine().trim();
+            String email = scanner.nextLine().trim();
 
             if (email.equals("0")) {
                 return;
             }
-
 
             System.out.println();
             System.out.println("Tipo de usuario:");
@@ -178,32 +133,22 @@ public class MenuUsuarios {
             System.out.println("2. Docente");
             System.out.println("0. Cancelar");
 
-            System.out.print(
-                    "\nSeleccione tipo: "
-            );
-
-            int tipo =
-                    ui.leerEntero();
+            System.out.print("\nSeleccione tipo: ");
+            int tipo = ui.leerEntero();
 
             if (tipo == 0) {
                 return;
             }
 
             if (tipo != 1 && tipo != 2) {
-
-                ui.mostrarMensaje(
-                        "Tipo de usuario invalido."
-                );
-
+                ui.mostrarMensaje("Tipo de usuario invalido.");
                 continue;
             }
-
 
             String tipoTexto =
                     tipo == 1
                             ? "ESTUDIANTE"
                             : "DOCENTE";
-
 
             ui.limpiarPantalla();
 
@@ -211,20 +156,9 @@ public class MenuUsuarios {
             System.out.println("║           CONFIRMAR NUEVO USUARIO           ║");
             System.out.println("╠══════════════════════════════════════════════╣");
 
-            System.out.printf(
-                    "║ DNI:      %-34s║%n",
-                    dni
-            );
-
-            System.out.printf(
-                    "║ Nombre:   %-34s║%n",
-                    nombre
-            );
-
-            System.out.printf(
-                    "║ Apellido: %-34s║%n",
-                    apellido
-            );
+            System.out.printf("║ DNI:      %-34s║%n", dni);
+            System.out.printf("║ Nombre:   %-34s║%n", nombre);
+            System.out.printf("║ Apellido: %-34s║%n", apellido);
 
             System.out.printf(
                     "║ Email:    %-34s║%n",
@@ -233,10 +167,7 @@ public class MenuUsuarios {
                             : email
             );
 
-            System.out.printf(
-                    "║ Tipo:     %-34s║%n",
-                    tipoTexto
-            );
+            System.out.printf("║ Tipo:     %-34s║%n", tipoTexto);
 
             System.out.println("╠══════════════════════════════════════════════╣");
             System.out.println("║  1. Confirmar                               ║");
@@ -244,12 +175,8 @@ public class MenuUsuarios {
             System.out.println("║  0. Cancelar                                ║");
             System.out.println("╚══════════════════════════════════════════════╝");
 
-            System.out.print(
-                    "\nSeleccione opcion: "
-            );
-
-            int confirmacion =
-                    ui.leerEntero();
+            System.out.print("\nSeleccione opcion: ");
+            int confirmacion = ui.leerEntero();
 
             if (confirmacion == 0) {
                 return;
@@ -260,19 +187,13 @@ public class MenuUsuarios {
             }
 
             if (confirmacion != 1) {
-
-                ui.mostrarMensaje(
-                        "Opcion invalida."
-                );
-
+                ui.mostrarMensaje("Opcion invalida.");
                 continue;
             }
-
 
             Usuario usuario;
 
             if (tipo == 1) {
-
                 usuario = new Estudiante(
                         0,
                         dni,
@@ -280,9 +201,7 @@ public class MenuUsuarios {
                         apellido,
                         email
                 );
-
             } else {
-
                 usuario = new Docente(
                         0,
                         dni,
@@ -292,15 +211,12 @@ public class MenuUsuarios {
                 );
             }
 
-
             UsuarioDAO usuarioDAO =
                     new UsuarioDAO();
 
             try {
 
-                usuarioDAO.guardar(
-                        usuario
-                );
+                usuarioDAO.guardar(usuario);
 
                 ui.mostrarMensaje(
                         "Usuario registrado correctamente."
@@ -312,17 +228,12 @@ public class MenuUsuarios {
 
                 if (
                         e.getMessage() != null
-                                && e.getMessage().contains(
-                                "Duplicate entry"
-                        )
+                                && e.getMessage().contains("Duplicate entry")
                 ) {
-
                     ui.mostrarMensaje(
                             "Ya existe un usuario registrado con ese DNI."
                     );
-
                 } else {
-
                     ui.mostrarMensaje(
                             "No se pudo registrar el usuario: "
                                     + e.getMessage()
@@ -334,7 +245,6 @@ public class MenuUsuarios {
         }
     }
 
-
     private void buscarUsuario() {
 
         ui.limpiarPantalla();
@@ -343,22 +253,17 @@ public class MenuUsuarios {
         System.out.println("║                BUSCAR USUARIO               ║");
         System.out.println("╚══════════════════════════════════════════════╝");
 
-        System.out.print(
-                "\nIngrese DNI, nombre o apellido: "
-        );
+        System.out.print("\nIngrese DNI, nombre o apellido: ");
 
         String texto =
                 scanner.nextLine().trim();
 
         if (texto.isEmpty()) {
-
             ui.mostrarMensaje(
                     "Debe ingresar un criterio de busqueda."
             );
-
             return;
         }
-
 
         UsuarioDAO usuarioDAO =
                 new UsuarioDAO();
@@ -366,13 +271,9 @@ public class MenuUsuarios {
         try {
 
             List<Usuario> usuarios =
-                    usuarioDAO.buscarCoincidencias(
-                            texto
-                    );
+                    usuarioDAO.buscarCoincidencias(texto);
 
-            seleccionarUsuario(
-                    usuarios
-            );
+            seleccionarUsuario(usuarios);
 
         } catch (SQLException e) {
 
@@ -382,7 +283,6 @@ public class MenuUsuarios {
             );
         }
     }
-
 
     private void listarUsuarios() {
 
@@ -394,9 +294,7 @@ public class MenuUsuarios {
             List<Usuario> usuarios =
                     usuarioDAO.listarTodos();
 
-            seleccionarUsuario(
-                    usuarios
-            );
+            seleccionarUsuario(usuarios);
 
         } catch (SQLException e) {
 
@@ -406,7 +304,6 @@ public class MenuUsuarios {
             );
         }
     }
-
 
     private void filtrarPorEstado() {
 
@@ -420,9 +317,7 @@ public class MenuUsuarios {
         System.out.println("║  0. Volver                                  ║");
         System.out.println("╚══════════════════════════════════════════════╝");
 
-        System.out.print(
-                "\nSeleccione opcion: "
-        );
+        System.out.print("\nSeleccione opcion: ");
 
         int opcion =
                 ui.leerEntero();
@@ -431,18 +326,10 @@ public class MenuUsuarios {
             return;
         }
 
-        if (
-                opcion != 1
-                        && opcion != 2
-        ) {
-
-            ui.mostrarMensaje(
-                    "Opcion invalida."
-            );
-
+        if (opcion != 1 && opcion != 2) {
+            ui.mostrarMensaje("Opcion invalida.");
             return;
         }
-
 
         boolean estadoBuscado =
                 opcion == 1;
@@ -464,9 +351,7 @@ public class MenuUsuarios {
                             )
                             .toList();
 
-            seleccionarUsuario(
-                    filtrados
-            );
+            seleccionarUsuario(filtrados);
 
         } catch (SQLException e) {
 
@@ -477,7 +362,6 @@ public class MenuUsuarios {
         }
     }
 
-
     private void seleccionarUsuario(
             List<Usuario> usuarios
     ) {
@@ -485,47 +369,45 @@ public class MenuUsuarios {
         ui.limpiarPantalla();
 
         if (usuarios.isEmpty()) {
-
-            ui.mostrarMensaje(
-                    "No se encontraron usuarios."
-            );
-
+            ui.mostrarMensaje("No se encontraron usuarios.");
             return;
         }
 
-
         System.out.println(
-                "╔════════════════════════════════════════════════════════════════════════╗"
+                "╔════════════════════════════════════════════════════════════════════════════════════╗"
         );
 
         System.out.println(
-                "║                         LISTADO DE USUARIOS                           ║"
+                "║                              LISTADO DE USUARIOS                                  ║"
         );
 
         System.out.println(
-                "╚════════════════════════════════════════════════════════════════════════╝"
+                "╚════════════════════════════════════════════════════════════════════════════════════╝"
         );
 
         System.out.println();
 
         System.out.println(
-                "----------------------------------------------------------------------------"
+                "----------------------------------------------------------------------------------------"
         );
 
         System.out.printf(
-                "%-4s %-10s %-18s %-18s %-12s %-12s%n",
+                "%-4s %-10s %-18s %-18s %-12s %-12s %-12s%n",
                 "N°",
                 "DNI",
                 "Nombre",
                 "Apellido",
                 "Tipo",
+                "Prestamos",
                 "Estado"
         );
 
         System.out.println(
-                "----------------------------------------------------------------------------"
+                "----------------------------------------------------------------------------------------"
         );
 
+        PrestamoDAO prestamoDAO =
+                new PrestamoDAO();
 
         for (int i = 0; i < usuarios.size(); i++) {
 
@@ -542,28 +424,49 @@ public class MenuUsuarios {
                             ? "ACTIVO"
                             : "SUSPENDIDO";
 
+            String prestamos;
+
+            try {
+
+                int prestamosActivos =
+                        prestamoDAO
+                                .listarPrestamosActivosPorUsuario(
+                                        usuario.getId()
+                                )
+                                .size();
+
+                prestamos =
+                        prestamosActivos
+                                + "/"
+                                + usuario.obtenerLimitePrestamos();
+
+            } catch (SQLException e) {
+
+                prestamos =
+                        "?/"
+                                + usuario.obtenerLimitePrestamos();
+            }
+
             System.out.printf(
-                    "%-4d %-10s %-18s %-18s %-12s %-12s%n",
+                    "%-4d %-10s %-18s %-18s %-12s %-12s %-12s%n",
                     i + 1,
                     usuario.getDni(),
                     usuario.getNombre(),
                     usuario.getApellido(),
                     tipo,
+                    prestamos,
                     estado
             );
         }
 
-
         System.out.println(
-                "----------------------------------------------------------------------------"
+                "----------------------------------------------------------------------------------------"
         );
 
         System.out.println();
         System.out.println("0. Volver");
 
-        System.out.print(
-                "\nSeleccione usuario: "
-        );
+        System.out.print("\nSeleccione usuario: ");
 
         int seleccion =
                 ui.leerEntero();
@@ -576,14 +479,9 @@ public class MenuUsuarios {
                 seleccion < 1
                         || seleccion > usuarios.size()
         ) {
-
-            ui.mostrarMensaje(
-                    "Seleccion invalida."
-            );
-
+            ui.mostrarMensaje("Seleccion invalida.");
             return;
         }
-
 
         Usuario usuarioSeleccionado =
                 usuarios.get(
@@ -594,7 +492,6 @@ public class MenuUsuarios {
                 usuarioSeleccionado
         );
     }
-
 
     private void mostrarFichaUsuario(
             Usuario usuario
@@ -621,7 +518,6 @@ public class MenuUsuarios {
                             || usuario.getEmail().isBlank()
                             ? "-"
                             : usuario.getEmail();
-
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -662,9 +558,7 @@ public class MenuUsuarios {
                     estado
             );
 
-            if (
-                    !usuario.isActivo()
-            ) {
+            if (!usuario.isActivo()) {
 
                 String motivo =
                         usuario.getMotivoSuspension() == null
@@ -718,13 +612,10 @@ public class MenuUsuarios {
                     "╚══════════════════════════════════════════════╝"
             );
 
-            System.out.print(
-                    "\nSeleccione opcion: "
-            );
+            System.out.print("\nSeleccione opcion: ");
 
             opcion =
                     ui.leerEntero();
-
 
             switch (opcion) {
 
@@ -742,7 +633,6 @@ public class MenuUsuarios {
                     break;
                 }
 
-
                 case 2: {
 
                     MenuPrestamos menuPrestamos =
@@ -756,7 +646,6 @@ public class MenuUsuarios {
 
                     break;
                 }
-
 
                 case 3: {
 
@@ -772,24 +661,13 @@ public class MenuUsuarios {
                     break;
                 }
 
-
                 case 4:
-
-                    modificarDatosUsuario(
-                            usuario
-                    );
-
+                    modificarDatosUsuario(usuario);
                     break;
-
 
                 case 5:
-
-                    cambiarEstadoUsuario(
-                            usuario
-                    );
-
+                    cambiarEstadoUsuario(usuario);
                     break;
-
 
                 case 6: {
 
@@ -805,23 +683,16 @@ public class MenuUsuarios {
                     break;
                 }
 
-
                 case 0:
                     break;
 
-
                 default:
-
-                    ui.mostrarMensaje(
-                            "Opcion invalida."
-                    );
-
+                    ui.mostrarMensaje("Opcion invalida.");
                     break;
             }
 
         } while (opcion != 0);
     }
-
 
     private void modificarDatosUsuario(
             Usuario usuario
@@ -861,7 +732,6 @@ public class MenuUsuarios {
 
         System.out.println();
 
-
         System.out.println(
                 "Nombre actual: "
                         + usuario.getNombre()
@@ -879,11 +749,9 @@ public class MenuUsuarios {
         }
 
         if (nuevoNombre.isEmpty()) {
-
             nuevoNombre =
                     usuario.getNombre();
         }
-
 
         System.out.println();
 
@@ -904,11 +772,9 @@ public class MenuUsuarios {
         }
 
         if (nuevoApellido.isEmpty()) {
-
             nuevoApellido =
                     usuario.getApellido();
         }
-
 
         System.out.println();
 
@@ -935,11 +801,9 @@ public class MenuUsuarios {
         }
 
         if (nuevoEmail.isEmpty()) {
-
             nuevoEmail =
                     usuario.getEmail();
         }
-
 
         ui.limpiarPantalla();
 
@@ -998,7 +862,6 @@ public class MenuUsuarios {
                 "\nSeleccione opcion: "
         );
 
-
         int confirmacion =
                 ui.leerEntero();
 
@@ -1007,14 +870,9 @@ public class MenuUsuarios {
         }
 
         if (confirmacion != 1) {
-
-            ui.mostrarMensaje(
-                    "Opcion invalida."
-            );
-
+            ui.mostrarMensaje("Opcion invalida.");
             return;
         }
-
 
         String nombreAnterior =
                 usuario.getNombre();
@@ -1024,7 +882,6 @@ public class MenuUsuarios {
 
         String emailAnterior =
                 usuario.getEmail();
-
 
         usuario.setNombre(
                 nuevoNombre
@@ -1037,7 +894,6 @@ public class MenuUsuarios {
         usuario.setEmail(
                 nuevoEmail
         );
-
 
         UsuarioDAO usuarioDAO =
                 new UsuarioDAO();
@@ -1101,14 +957,10 @@ public class MenuUsuarios {
 
         ui.limpiarPantalla();
 
-
         boolean estadoActual =
                 usuario.isActivo();
 
-
-        if (
-                estadoActual
-        ) {
+        if (estadoActual) {
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -1165,43 +1017,26 @@ public class MenuUsuarios {
                     "\nSeleccione opcion: "
             );
 
-
             int confirmacion =
                     ui.leerEntero();
 
-
-            if (
-                    confirmacion == 0
-            ) {
-
+            if (confirmacion == 0) {
                 return;
             }
 
-
-            if (
-                    confirmacion != 1
-            ) {
-
-                ui.mostrarMensaje(
-                        "Opcion invalida."
-                );
-
+            if (confirmacion != 1) {
+                ui.mostrarMensaje("Opcion invalida.");
                 return;
             }
 
-
-            usuario.setActivo(
-                    false
-            );
+            usuario.setActivo(false);
 
             usuario.setMotivoSuspension(
                     MotivoSuspension.MANUAL
             );
 
-
             UsuarioDAO usuarioDAO =
                     new UsuarioDAO();
-
 
             try {
 
@@ -1210,10 +1045,7 @@ public class MenuUsuarios {
                                 usuario
                         );
 
-
-                if (
-                        actualizado
-                ) {
+                if (actualizado) {
 
                     ui.mostrarMensaje(
                             "Usuario suspendido correctamente."
@@ -1221,21 +1053,16 @@ public class MenuUsuarios {
 
                 } else {
 
-                    usuario.setActivo(
-                            true
-                    );
+                    usuario.setActivo(true);
 
                     ui.mostrarMensaje(
                             "No se pudo actualizar el estado."
                     );
                 }
 
-
             } catch (SQLException e) {
 
-                usuario.setActivo(
-                        true
-                );
+                usuario.setActivo(true);
 
                 ui.mostrarMensaje(
                         "Error al actualizar el estado: "
@@ -1243,22 +1070,13 @@ public class MenuUsuarios {
                 );
             }
 
-
             return;
         }
 
-
-        /*
-         * Si queremos reactivar a un usuario suspendido,
-         * primero revisamos que no siga superando el umbral
-         * de multas pendientes.
-         */
         MultaDAO multaDAO =
                 new MultaDAO();
 
-
         double totalPendiente;
-
 
         try {
 
@@ -1267,7 +1085,6 @@ public class MenuUsuarios {
                             .obtenerTotalPendientePorUsuario(
                                     usuario.getId()
                             );
-
 
         } catch (SQLException e) {
 
@@ -1279,10 +1096,8 @@ public class MenuUsuarios {
             return;
         }
 
-
         final double UMBRAL_SUSPENSION =
                 5000.0;
-
 
         if (
                 totalPendiente
@@ -1293,10 +1108,8 @@ public class MenuUsuarios {
                     MotivoSuspension.DEUDA
             );
 
-
             UsuarioDAO usuarioDAO =
                     new UsuarioDAO();
-
 
             try {
 
@@ -1314,9 +1127,7 @@ public class MenuUsuarios {
                 return;
             }
 
-
             ui.limpiarPantalla();
-
 
             System.out.println(
                     "╔══════════════════════════════════════════════╗"
@@ -1361,16 +1172,13 @@ public class MenuUsuarios {
             return;
         }
 
-
         String motivoActual =
                 usuario.getMotivoSuspension() == null
                         ? "SIN_ESPECIFICAR"
                         : usuario.getMotivoSuspension()
                                 .name();
 
-
         ui.limpiarPantalla();
-
 
         System.out.println(
                 "╔══════════════════════════════════════════════╗"
@@ -1424,43 +1232,25 @@ public class MenuUsuarios {
                 "\nSeleccione opcion: "
         );
 
-
         int confirmacion =
                 ui.leerEntero();
 
-
-        if (
-                confirmacion == 0
-        ) {
-
+        if (confirmacion == 0) {
             return;
         }
 
-
-        if (
-                confirmacion != 1
-        ) {
-
-            ui.mostrarMensaje(
-                    "Opcion invalida."
-            );
-
+        if (confirmacion != 1) {
+            ui.mostrarMensaje("Opcion invalida.");
             return;
         }
-
 
         MotivoSuspension motivoAnterior =
                 usuario.getMotivoSuspension();
 
-
-        usuario.setActivo(
-                true
-        );
-
+        usuario.setActivo(true);
 
         UsuarioDAO usuarioDAO =
                 new UsuarioDAO();
-
 
         try {
 
@@ -1469,10 +1259,7 @@ public class MenuUsuarios {
                             usuario
                     );
 
-
-            if (
-                    actualizado
-            ) {
+            if (actualizado) {
 
                 ui.mostrarMensaje(
                         "Usuario reactivado correctamente."
@@ -1480,9 +1267,7 @@ public class MenuUsuarios {
 
             } else {
 
-                usuario.setActivo(
-                        false
-                );
+                usuario.setActivo(false);
 
                 usuario.setMotivoSuspension(
                         motivoAnterior
@@ -1493,12 +1278,9 @@ public class MenuUsuarios {
                 );
             }
 
-
         } catch (SQLException e) {
 
-            usuario.setActivo(
-                    false
-            );
+            usuario.setActivo(false);
 
             usuario.setMotivoSuspension(
                     motivoAnterior
